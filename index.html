@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Compare Cartões: veja quanto cada cartão de crédito deixa no seu bolso por ano, já descontados anuidade, IOF e spread.">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Compare Cartões</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: ferramenta em duas colunas — perfil e filtros à esquerda, destaques e cartões ranqueados à direita; uma coluna no celular. Cores tiradas do logo (verde bandeira + amarelo ouro). */
+:root {
+  --bg: #F3F6F4;
+  --surface: #FFFFFF;
+  --surface-2: #F6F8F7;
+  --ink: #18261F;
+  --muted: #5A6B63;
+  --line: #DCE4DF;
+  --accent: #006D40;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E2F1E8;
+  --gold: #FFB000;
+  --gold-ink: #7A5000;
+  --gold-soft: #FFF3D4;
+  --pos: #12773F;
+  --neg: #B3382A;
+  --warn-bg: #FFF1E6;
+  --card-entrada: #D8E2DC;
+  --card-intermediario: #6E9A84;
+  --card-alta: #00512F;
+  --card-ultra: #10170F;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1310; --surface: #121C17; --surface-2: #17231D; --ink: #E4ECE7; --muted: #94A69C; --line: #26352D;
+    --accent: #3DBE7E; --accent-ink: #04120A; --accent-soft: #15301F; --gold: #F5B533; --gold-ink: #F5C35E; --gold-soft: #2B2211;
+    --pos: #6FD49C; --neg: #F28B77; --warn-bg: #2E1C14;
+    --card-entrada: #3A4A42; --card-intermediario: #3E6E56; --card-alta: #0F4A30; --card-ultra: #040705;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1310; --surface: #121C17; --surface-2: #17231D; --ink: #E4ECE7; --muted: #94A69C; --line: #26352D;
+  --accent: #3DBE7E; --accent-ink: #04120A; --accent-soft: #15301F; --gold: #F5B533; --gold-ink: #F5C35E; --gold-soft: #2B2211;
+  --pos: #6FD49C; --neg: #F28B77; --warn-bg: #2E1C14;
+  --card-entrada: #3A4A42; --card-intermediario: #3E6E56; --card-alta: #0F4A30; --card-ultra: #040705;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 120px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+a { color: var(--accent); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tip-box { display: block; background: var(--gold-soft); border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.5; color: var(--ink); margin-top: 6px; }
+.tip-box[hidden] { display: none; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font-size: inherit; }
+
+/* Cabeçalho */
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand img { width: 48px; height: 48px; border-radius: 12px; flex: none; }
+h1 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+.tagline { color: var(--muted); margin: 2px 0 0; font-size: 14.5px; }
+.stamp { font-size: 12.5px; color: var(--muted); text-align: right; line-height: 1.6; }
+
+/* Atalhos */
+.presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; align-items: center; }
+.presets .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-right: 4px; }
+.preset-status { font-size: 13px; color: var(--muted); margin: 8px 0 0; min-height: 1.5em; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 13px; cursor: pointer; font-size: 14px; line-height: 1.2; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+/* Avisos */
+.alert { background: var(--warn-bg); border-radius: var(--radius); padding: 12px 16px; margin-top: 16px; font-size: 14px; }
+.alert b { color: var(--neg); }
+
+/* Grade principal */
+.grid { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 28px; margin-top: 20px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+aside { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.panel { background: var(--surface); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.panel h2 { font-size: 1.05rem; font-weight: 700; }
+.panel .hint { font-size: 12.5px; color: var(--muted); margin: -8px 0 0; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label, .field .flabel { font-size: 13px; font-weight: 500; }
+.field small, .sub-hint { color: var(--muted); font-size: 12px; }
+.money { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+.money span { padding-left: 10px; color: var(--muted); font-size: 13px; }
+.money input { border: 0; background: transparent; padding: 8px 10px 8px 6px; width: 100%; min-width: 0; font-family: var(--font-mono); }
+.money input:focus { outline: none; }
+.money:focus-within { border-color: var(--accent); }
+select, .plain { border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); padding: 8px 10px; width: 100%; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.quick { display: flex; flex-wrap: wrap; gap: 6px; }
+.quick button { border: 1px solid var(--line); background: var(--surface-2); border-radius: 6px; padding: 2px 8px; font-size: 12px; cursor: pointer; font-family: var(--font-mono); }
+.quick button:hover { border-color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips .chip { font-size: 13px; padding: 5px 11px; }
+.check { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; cursor: pointer; }
+.check input { margin-top: 3px; accent-color: var(--accent); }
+details.adv summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+details.adv[open] summary { margin-bottom: 10px; }
+details.adv .field + .field, details.adv .row2 { margin-top: 10px; }
+.more-toggle { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; border: 1px dashed var(--line); background: transparent; border-radius: 8px; padding: 7px 10px; cursor: pointer; font-size: 13.5px; color: var(--muted); }
+.more-toggle:hover { border-color: var(--accent); color: var(--ink); }
+.more-toggle .arrow { display: inline-block; transition: transform .15s; }
+.more-toggle[aria-expanded="true"] .arrow { transform: rotate(180deg); }
+.more-toggle .dot { background: var(--accent); color: var(--accent-ink); border-radius: 999px; font-size: 11px; padding: 0 6px; }
+.more-box { display: flex; flex-direction: column; gap: 12px; }
+.more-box[hidden] { display: none; }
+.more-toggle small { color: var(--muted); font-size: 12px; }
+.panel-actions { display: flex; gap: 8px; }
+
+/* Destaques */
+.highs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 22px; }
+@media (max-width: 1100px) { .highs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.high { background: var(--surface); border-radius: var(--radius); padding: 12px 14px; border: 1px solid transparent; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.high:hover { border-color: var(--accent); }
+.high .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.high .n { font-family: var(--font-display); font-weight: 700; font-size: 0.98rem; line-height: 1.2; }
+.high .v { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.95rem; }
+.high .v.pos { color: var(--pos); }
+.high .v.neg { color: var(--neg); }
+.highs-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+
+/* Barra de resultados */
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.bar .count { font-size: 14px; color: var(--muted); }
+.bar .count strong { color: var(--ink); font-size: 1.05rem; }
+.bar select { width: auto; }
+.results { display: flex; flex-direction: column; gap: 14px; }
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); padding: 28px; text-align: center; color: var(--muted); }
+
+/* Cartão de resultado */
+.res { background: var(--surface); border-radius: var(--radius); padding: 18px 20px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; border: 1px solid transparent; }
+.res.out { opacity: 0.75; }
+.res.top1 { border-color: var(--accent); }
+.res.foco { border-color: var(--gold); }
+.plastic { width: 62px; height: 40px; border-radius: 6px; position: relative; display: flex; align-items: flex-end; justify-content: flex-end; padding: 3px 5px; font-family: var(--font-mono); font-size: 8.5px; font-weight: 500; letter-spacing: 0.04em; color: #fff; margin-top: 2px; }
+.plastic::before { content: ""; position: absolute; left: 7px; top: 12px; width: 10px; height: 8px; border-radius: 2px; background: #E9C162; }
+.plastic.entrada { background: var(--card-entrada); color: var(--ink); }
+.plastic.intermediario { background: var(--card-intermediario); }
+.plastic.alta { background: var(--card-alta); }
+.plastic.ultra { background: linear-gradient(135deg, var(--card-ultra), #3a4642); }
+.res-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+.rank { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-right: 6px; }
+.res-sub { font-size: 13px; color: var(--muted); }
+.res-body { grid-column: 2; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+@media (max-width: 520px) { .res-body { grid-column: 1 / -1; } }
+.badges { display: flex; flex-wrap: wrap; gap: 5px; }
+.badge { font-size: 11.5px; padding: 2px 8px; border-radius: 4px; background: var(--surface-2); white-space: nowrap; }
+.badge.hl { background: var(--accent-soft); }
+.badge.gold { background: var(--gold-soft); color: var(--gold-ink); }
+.badge.warn { box-shadow: inset 0 0 0 1px var(--neg); color: var(--neg); background: transparent; }
+.money-row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 2fr); gap: 16px 24px; align-items: start; }
+@media (max-width: 680px) { .money-row { grid-template-columns: minmax(0, 1fr); } }
+.saldo .k, .metric .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.saldo .v { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 1.9rem; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
+.saldo .v.pos { color: var(--pos); }
+.saldo .v.neg { color: var(--neg); }
+.saldo .m { font-size: 13px; color: var(--muted); }
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.metric .v { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.98rem; font-weight: 500; }
+.metric .s { font-size: 12px; color: var(--muted); }
+.conta { font-size: 13px; color: var(--muted); background: var(--surface-2); border-radius: 8px; padding: 8px 12px; margin: 0; }
+.conta .num { color: var(--ink); }
+.conta .menos { color: var(--neg); }
+.escolha { font-size: 13px; margin: 0; padding-left: 10px; border-left: 3px solid var(--gold); }
+.why { font-size: 14px; margin: 0; }
+.why b { font-weight: 600; }
+.res-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13.5px; }
+.btn:hover { border-color: var(--accent); }
+.btn.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.det { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 14px; font-size: 13.5px; margin: 0; padding-top: 4px; }
+@media (max-width: 520px) { .det { grid-template-columns: minmax(0, 1fr); } .det dt { margin-top: 6px; } }
+.det dt { color: var(--muted); }
+.det dd { margin: 0; }
+.conf { font-size: 12px; }
+.conf.baixa { color: var(--neg); }
+
+/* Comparador */
+.tray { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 -6px 20px rgba(0,0,0,0.08); z-index: 5; }
+.tray .pick { font-size: 13px; background: var(--accent-soft); padding: 4px 10px; border-radius: 6px; display: inline-flex; gap: 6px; align-items: center; }
+.tray .pick button { border: 0; background: none; cursor: pointer; color: var(--muted); padding: 0 2px; }
+.cmp-wrap { margin-top: 28px; background: var(--surface); border-radius: var(--radius); padding: 18px; }
+.cmp-wrap h2 { font-size: 1.2rem; margin-bottom: 10px; }
+.cmp-scroll { overflow-x: auto; }
+table.cmp { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 13.5px; }
+table.cmp th, table.cmp td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+table.cmp th[scope="row"] { color: var(--muted); font-weight: 500; width: 150px; }
+table.cmp thead th { font-family: var(--font-display); font-size: 1rem; }
+table.cmp td.best { background: var(--accent-soft); }
+
+/* Rodapé e Entenda mais */
+.notes { margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.notes section { background: var(--surface); border-radius: var(--radius); padding: 18px; font-size: 13.5px; }
+.notes h2 { font-size: 1.05rem; margin-bottom: 8px; }
+.notes p { margin: 0 0 8px; max-width: 70ch; }
+.disclaimer { box-shadow: inset 3px 0 0 var(--gold); }
+details.learn { margin-top: 16px; background: var(--surface); border-radius: var(--radius); }
+details.learn > summary { list-style: none; cursor: pointer; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+details.learn > summary::-webkit-details-marker { display: none; }
+details.learn > summary h2 { font-size: 1.25rem; }
+details.learn > summary span { color: var(--muted); font-size: 13.5px; }
+details.learn > summary .arrow { font-size: 1.1rem; color: var(--accent); transition: transform .15s; }
+details.learn[open] > summary .arrow { transform: rotate(180deg); }
+.learn-body { padding: 0 20px 24px; display: flex; flex-direction: column; gap: 28px; }
+.learn-body section { border-top: 1px solid var(--line); padding-top: 20px; }
+.learn-body h3 { font-size: 1.08rem; margin-bottom: 8px; }
+.learn-body p, .learn-body li { max-width: 72ch; font-size: 14.5px; }
+.learn-body p { margin: 0 0 10px; }
+.learn-body ul { margin: 0 0 10px; padding-left: 20px; }
+.formula { font-family: var(--font-mono); font-size: 13.5px; background: var(--surface-2); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: nowrap; margin: 0 0 10px; }
+.vtable-wrap { overflow-x: auto; margin-bottom: 10px; }
+table.vtable { border-collapse: collapse; font-size: 14px; min-width: 520px; }
+table.vtable th, table.vtable td { text-align: left; padding: 7px 12px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.vtable th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; }
+table.vtable td.num { white-space: nowrap; }
+.gloss { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px 28px; margin: 0; }
+.gloss div { min-width: 0; }
+.gloss dt { font-weight: 600; font-size: 14.5px; }
+.gloss dd { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.readmore { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .more-toggle .arrow, details.learn > summary .arrow { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <img src="data:image/png;base64,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" alt="" width="48" height="48">
+      <div style="min-width:0">
+        <h1>Compare Cartões</h1>
+        <p class="tagline">Quanto cada cartão deixa no seu bolso por ano, já descontados anuidade, IOF e spread.</p>
+      </div>
+    </div>
+    <div class="stamp">Dados de <span id="stamp-date">—</span> · <span id="stamp-count">—</span> cartões<br><a href="#aviso">Aviso</a> · <a href="#entenda" data-open-learn>Entenda mais</a></div>
+  </header>
+
+  <div class="presets" role="group" aria-label="Atalhos de filtro">
+    <span class="lbl">Atalhos</span>
+    <button class="chip" type="button" data-preset="semanuidade" aria-pressed="false">Não quero pagar anuidade</button>
+    <button class="chip" type="button" data-preset="vip" aria-pressed="false">Salas VIP ilimitadas</button>
+    <button class="chip" type="button" data-preset="aereo" aria-pressed="false">Upgrade e status em voos</button>
+    <button class="chip" type="button" data-preset="exterior" aria-pressed="false">Compro muito no exterior</button>
+    <button class="chip" type="button" data-preset="pontos" aria-pressed="false">Juntar o máximo de pontos</button>
+  </div>
+  <p class="preset-status" id="preset-status" aria-live="polite">Os atalhos só ajustam filtros e ordem. O seu perfil não muda.</p>
+
+  <div class="alert" id="alerta-rotativo" hidden>
+    <b>Se você não paga a fatura inteira, nenhum cartão desta lista compensa.</b> Os juros do rotativo e do parcelamento da fatura passam de 10% ao mês e engolem qualquer cashback ou ponto. A prioridade é quitar a dívida, de preferência trocando por um empréstimo mais barato. Veja “Crédito rotativo” em <a href="#entenda" data-open-learn>Entenda mais</a>.
+  </div>
+
+  <div class="grid">
+    <aside>
+      <form class="panel" id="perfil" autocomplete="off">
+        <h2>Seu perfil</h2>
+        <p class="hint">Fica só no seu navegador.</p>
+        <div class="field">
+          <label for="gasto">Gasto mensal no cartão</label>
+          <div class="money"><span>R$</span><input id="gasto" inputmode="numeric" value="10.000"></div>
+          <div class="quick" data-target="gasto">
+            <button type="button" data-v="3000">3 mil</button><button type="button" data-v="5000">5 mil</button><button type="button" data-v="10000">10 mil</button><button type="button" data-v="20000">20 mil</button><button type="button" data-v="50000">50 mil</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="exterior">Desse total, quanto é em moeda estrangeira</label>
+          <div class="money"><span>R$</span><input id="exterior" inputmode="numeric" value="0"></div>
+          <small>Viagens, sites e assinaturas cobradas em dólar. Nessas compras o cartão cobra IOF e spread. <button type="button" class="linkbtn tip-toggle" aria-expanded="false">O que é spread?</button></small>
+          <span class="tip-box" data-tip="spread" hidden></span>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="invest">Investimentos</label>
+            <div class="money"><span>R$</span><input id="invest" inputmode="numeric" value="0"></div>
+          </div>
+          <div class="field">
+            <label for="renda">Renda mensal</label>
+            <div class="money"><span>R$</span><input id="renda" inputmode="numeric" value="12.000"></div>
+          </div>
+        </div>
+        <small class="sub-hint" style="margin-top:-8px">Servem para saber quais cartões você consegue pedir ou isentar.</small>
+        <div class="field">
+          <label for="usosvip">Vezes por ano que usaria sala VIP</label>
+          <input class="plain num" id="usosvip" type="number" min="0" max="100" value="0">
+        </div>
+        <label class="check"><input type="checkbox" id="integral" checked> Pago a fatura inteira todo mês</label>
+        <details class="adv" id="ajustes">
+          <summary>Ajustes do cálculo</summary>
+          <div class="field">
+            <label for="pref">Cartões que deixam escolher entre pontos e cashback</label>
+            <select id="pref">
+              <option value="melhor">Calcular com a opção que rende mais</option>
+              <option value="cashback">Prefiro cashback</option>
+              <option value="pontos">Prefiro pontos</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="milheiro">Quanto vale 1.000 pontos ou milhas</label>
+            <div class="money"><span>R$</span><input id="milheiro" inputmode="decimal" value="25"></div>
+            <small>Valor de referência. A explicação está em Entenda mais.</small>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="dolar">Dólar</label>
+              <div class="money"><span>R$</span><input id="dolar" inputmode="decimal" value="5,15"></div>
+            </div>
+            <div class="field">
+              <label for="valorvip">Valor de 1 acesso VIP</label>
+              <div class="money"><span>R$</span><input id="valorvip" inputmode="numeric" value="150"></div>
+            </div>
+          </div>
+        </details>
+      </form>
+
+      <div class="panel" id="filtros">
+        <h2>Filtros</h2>
+        <div class="field">
+          <span class="flabel">O que você quer do cartão</span>
+          <div class="chips" id="f-obj">
+            <button type="button" class="chip" data-v="cashback" aria-pressed="false">Cashback</button>
+            <button type="button" class="chip" data-v="pontos" aria-pressed="false">Pontos e milhas</button>
+            <button type="button" class="chip" data-v="vip" aria-pressed="false">Salas VIP ilimitadas</button>
+            <button type="button" class="chip" data-v="aereo" aria-pressed="false">Vinculado a companhia aérea</button>
+            <button type="button" class="chip" data-v="upgrade" aria-pressed="false">Upgrade ou status</button>
+            <button type="button" class="chip" data-v="iof" aria-pressed="false">Sem IOF</button>
+            <button type="button" class="chip" data-v="spread0" aria-pressed="false">Spread zero</button>
+            <button type="button" class="chip" data-v="descontos" aria-pressed="false">Descontos especiais</button>
+          </div>
+          <small class="sub-hint"><button type="button" class="linkbtn tip-toggle" aria-expanded="false">O que é spread zero?</button></small>
+          <span class="tip-box" data-tip="spread" hidden></span>
+        </div>
+        <div class="field">
+          <span class="flabel">Faixa</span>
+          <div class="chips" id="f-faixa">
+            <button type="button" class="chip" data-v="entrada" aria-pressed="false">Entrada</button>
+            <button type="button" class="chip" data-v="intermediario" aria-pressed="false">Intermediário</button>
+            <button type="button" class="chip" data-v="alta" aria-pressed="false">Alta renda</button>
+            <button type="button" class="chip" data-v="ultra" aria-pressed="false">Ultra</button>
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="semanuidade"> Só cartões que saem sem anuidade para mim</label>
+        <label class="check"><input type="checkbox" id="f-fora"> Incluir cartões fora do meu alcance (investimento, renda ou convite)</label>
+
+        <button type="button" class="more-toggle" id="mais-toggle" aria-expanded="false" aria-controls="mais-filtros">Mais filtros <small>bandeira, banco, companhia, anuidade</small> <span class="dot" id="mais-dot" hidden></span> <span class="arrow" aria-hidden="true">▾</span></button>
+        <div class="more-box" id="mais-filtros" hidden>
+          <div class="row2">
+            <div class="field"><label for="f-bandeira">Bandeira</label><select id="f-bandeira"><option value="">Todas</option></select></div>
+            <div class="field"><label for="f-banco">Banco</label><select id="f-banco"><option value="">Todos</option></select></div>
+          </div>
+          <div class="field"><label for="f-cia">Companhia aérea</label><select id="f-cia"><option value="">Qualquer</option></select></div>
+          <div class="field"><label for="f-anuidade">Anuidade cheia de até</label>
+            <select id="f-anuidade"><option value="">Qualquer valor</option><option value="0">Sem anuidade</option><option value="1200">R$ 1.200</option><option value="2500">R$ 2.500</option><option value="5000">R$ 5.000</option></select>
+          </div>
+        </div>
+        <div class="panel-actions"><button type="button" class="btn" id="limpar">Limpar filtros</button></div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="highs-title">Os melhores para o seu perfil, entre os cartões ao seu alcance</div>
+      <div class="highs" id="highs"></div>
+      <div class="bar">
+        <div class="count" id="count" aria-live="polite"></div>
+        <label class="field" style="flex-direction:row;align-items:center;gap:8px"><span class="flabel" style="font-size:13px;color:var(--muted)">Ordenar por</span>
+          <select id="ordem">
+            <option value="saldo">Saldo estimado no ano</option>
+            <option value="ptsNac">Pontos por dólar (Brasil)</option>
+            <option value="ptsInt">Pontos por dólar (exterior)</option>
+            <option value="retorno">Retorno em %</option>
+            <option value="anuidade">Menor anuidade para mim</option>
+            <option value="vip">Mais acessos VIP</option>
+          </select>
+        </label>
+      </div>
+      <div class="results" id="results">
+        <div class="empty">Carregando os cartões…</div>
+      </div>
+      <section class="cmp-wrap" id="comparar" hidden>
+        <h2>Comparação lado a lado</h2>
+        <div class="cmp-scroll"><table class="cmp" id="cmp-table"></table></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="notes" id="aviso">
+    <section class="disclaimer">
+      <h2>Aviso</h2>
+      <p>Este comparador é informativo e foi feito por quem não trabalha no setor. Não é recomendação financeira e não tem ligação com bancos ou bandeiras. Não há links pagos.</p>
+      <p>As condições dos cartões mudam com frequência. Antes de pedir um cartão, confirme anuidade, pontuação e regras no site do emissor. Promoções temporárias não entram no cálculo.</p>
+    </section>
+    <section>
+      <h2>Fontes</h2>
+      <p>Sites dos emissores e levantamentos de Passageiro de Primeira, Cartões Alta Renda, Melhores Cartões e Melhores Destinos. Cada cartão mostra a fonte e o grau de confiança do dado em Detalhes. Os dados são revisados todo mês.</p>
+    </section>
+  </div>
+
+  <details class="learn" id="entenda">
+    <summary><div><h2>Entenda mais</h2><span>Como o retorno é calculado, quanto vale um ponto e os termos mais usados</span></div><span class="arrow" aria-hidden="true">▾</span></summary>
+    <div class="learn-body">
+      <section>
+        <h3>Como o saldo no ano é calculado</h3>
+        <p>O saldo é quanto o cartão deixa no seu bolso em 12 meses, com o gasto que você informou:</p>
+        <p class="formula">saldo = recompensa + salas VIP − anuidade para você − custo no exterior</p>
+        <ul>
+          <li><b>Recompensa:</b> gasto anual × cashback, ou pontos ganhos × valor do ponto. Os pontos são contados por dólar: o gasto em reais é dividido pela cotação do dólar e multiplicado pela pontuação do cartão. Exemplo: R$ 10 mil por mês ÷ R$ 5,15 ≈ US$ 1.942; com 2,5 pontos por dólar, são cerca de 4.850 pontos por mês, ou 58 mil por ano. A R$ 25 por mil pontos, isso dá cerca de R$ 1.450 por ano.</li>
+          <li><b>Anuidade para você:</b> zera ou cai pela metade quando o seu gasto mensal ou os seus investimentos atingem a regra de isenção do banco.</li>
+          <li><b>Custo no exterior:</b> spread do banco + IOF de 3,5% sobre o que você gasta em moeda estrangeira. Nos cartões com IOF zero ou devolvido, só o spread conta. Quando o banco não informa o spread, o cálculo usa 5%.</li>
+          <li><b>Salas VIP:</b> só entram se você disser quantas vezes usaria por ano, até o limite do cartão, a R$ 150 por acesso (valor que você pode mudar).</li>
+        </ul>
+        <p>O resultado é uma estimativa. Bônus de adesão e campanhas de pontos em dobro não entram, porque duram pouco.</p>
+      </section>
+
+      <section>
+        <h3>Pontos ou cashback: é um ou outro</h3>
+        <p>Alguns cartões deixam o cliente escolher como recebe a recompensa: em pontos ou em dinheiro de volta (cashback). Não é possível receber os dois sobre a mesma compra. Hoje isso vale, por exemplo, para BTG Black, BTG Ultrablue, XP Visa Infinite, XP Privilege e Rico.</p>
+        <p>Nesses cartões, o site calcula as duas opções e mostra a que rende mais para você, com a diferença em reais. Em Ajustes do cálculo, você pode fixar a sua preferência por cashback ou por pontos.</p>
+        <p>Regra prática: se você vai trocar os pontos por produtos ou não quer acompanhar promoções, cashback costuma ser melhor. Se você emite passagens e aproveita transferências com bônus, os pontos tendem a valer mais.</p>
+      </section>
+
+      <section>
+        <h3>Quanto vale um ponto</h3>
+        <p>Ponto de banco (Livelo, Esfera, Átomos, Itaú Shop e outros) e milha de companhia aérea (Smiles, LATAM Pass, Azul Fidelidade) não têm preço fixo. O valor depende do uso. A referência do mercado é o “milheiro”: quanto valem 1.000 pontos.</p>
+        <div class="vtable-wrap">
+          <table class="vtable">
+            <thead><tr><th>Como você usa</th><th>Valor aproximado por 1.000</th><th>Observação</th></tr></thead>
+            <tbody>
+              <tr><td>Passagens aéreas</td><td class="num">R$ 20 a R$ 40 ou mais</td><td>Costuma ser o melhor uso. Varia com destino, data e antecedência.</td></tr>
+              <tr><td>Venda em sites de compra de milhas</td><td class="num">R$ 13 a R$ 30</td><td>LATAM Pass costuma pagar mais; Smiles e Azul, menos. Vários programas proíbem a venda no regulamento e podem bloquear a conta.</td></tr>
+              <tr><td>Troca por dinheiro ou desconto na fatura</td><td class="num">cerca de R$ 18</td><td>Exemplo: Livelo convertida em dinheiro. Simples, sem esforço.</td></tr>
+              <tr><td>Produtos no catálogo do programa</td><td class="num">R$ 10 a R$ 15</td><td>Geralmente o pior uso, porque os produtos ficam caros em pontos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>O site usa R$ 25 por mil como padrão: um valor intermediário para quem troca por passagens ou vende de vez em quando. Se você só troca por produtos, coloque R$ 12 em Ajustes do cálculo e veja como o ranking muda.</p>
+        <p>Pontos de banco podem ser transferidos para as companhias aéreas. Com frequência há campanhas de transferência bonificada, em que 1.000 pontos viram 1.500 a 2.000 milhas. É assim que quem estuda o assunto tira mais valor.</p>
+        <div class="readmore">
+          <a href="https://passageirodeprimeira.com/quanto-vale-uma-milha-quanto-vale-um-ponto-minha-visao/" target="_blank" rel="noopener">Quanto vale uma milha (Passageiro de Primeira)</a>
+          <a href="https://www.idinheiro.com.br/cartao-de-credito/milhas/quanto-vale-uma-milha/" target="_blank" rel="noopener">Preço de venda por programa (iDinheiro)</a>
+        </div>
+      </section>
+
+      <section>
+        <h3>Termos que você vai encontrar</h3>
+        <dl class="gloss">
+          <div><dt>Bandeira</dt><dd>Empresa que mantém a rede que aceita o cartão e define parte dos benefícios, como seguros e salas VIP: Visa, Mastercard, Elo, American Express.</dd></div>
+          <div><dt>Emissor</dt><dd>O banco ou fintech que aprova o cartão, define o limite, cobra a fatura e cria o programa de pontos: Nubank, Itaú, BTG, Mercado Pago.</dd></div>
+          <div><dt>Categoria</dt><dd>Nível do cartão dentro da bandeira: Internacional, Gold, Platinum, Black/Infinite, World Legend/Infinite Privilege. Quanto mais alta, mais benefícios e, em geral, maior a anuidade.</dd></div>
+          <div><dt>Anuidade</dt><dd>Tarifa anual pela manutenção do cartão, quase sempre cobrada em 12 parcelas na fatura. Muitos cartões digitais não cobram.</dd></div>
+          <div><dt>Isenção de anuidade</dt><dd>Regra que zera ou reduz a anuidade se você gastar um valor mínimo por mês ou mantiver investimentos no banco. Não vale a pena gastar mais só para atingir a meta.</dd></div>
+          <div><dt>Crédito rotativo</dt><dd>Juros cobrados quando você paga só parte da fatura, como o pagamento mínimo. Estão entre os juros mais altos do país. Desde 2024 os juros totais do rotativo não podem passar de 100% da dívida original.</dd></div>
+          <div><dt>Pagamento mínimo</dt><dd>Menor valor que o banco aceita para não considerar a fatura atrasada. O saldo restante vai para o rotativo ou para o parcelamento da fatura, ambos com juros.</dd></div>
+          <div><dt>Cashback</dt><dd>Parte do valor gasto devolvida em dinheiro, crédito na fatura ou investimento. Chamado de “investback” quando o dinheiro vai direto para uma aplicação.</dd></div>
+          <div><dt>Pontos</dt><dd>Recompensa do programa do banco, calculada por dólar gasto mesmo em compras no Brasil. Podem ser trocados por produtos, dinheiro ou transferidos para companhias aéreas.</dd></div>
+          <div><dt>Milhas</dt><dd>Pontos de programa de companhia aérea (Smiles, LATAM Pass, Azul Fidelidade, TAP Miles&amp;Go). Servem principalmente para emitir passagens.</dd></div>
+          <div><dt>Milheiro</dt><dd>Forma de medir o valor dos pontos: quanto valem 1.000 pontos ou milhas, em reais.</dd></div>
+          <div><dt>Transferência bonificada</dt><dd>Campanha em que pontos do banco passam para uma companhia aérea com bônus, por exemplo 1.000 pontos virando 1.800 milhas.</dd></div>
+          <div><dt>Cartão co-branded</dt><dd>Cartão feito em parceria com uma empresa, como os da Azul, LATAM e GOL. Pontua direto no programa da parceira e dá benefícios com ela, como bagagem grátis.</dd></div>
+          <div><dt>Status ou categoria</dt><dd>Nível do cliente no programa da companhia aérea (Diamante, Black, Platinum…). Dá embarque prioritário, bagagem extra e mais chance de upgrade.</dd></div>
+          <div><dt>Upgrade de cabine</dt><dd>Troca da passagem econômica por uma cabine superior (Premium Economy ou Executiva), sujeita a disponibilidade. Alguns cartões dão cupons para isso.</dd></div>
+          <div><dt>IOF</dt><dd>Imposto federal sobre compras em moeda estrangeira com cartão de crédito, hoje de 3,5%. Alguns cartões não cobram ou devolvem o valor.</dd></div>
+          <div><dt>Spread cambial</dt><dd>Margem que o banco cobra em cima da cotação do dólar nas compras em moeda estrangeira, normalmente entre 0% e 6%. Soma-se ao IOF. Exemplo: com o dólar a R$ 5,15, uma compra de US$ 100 vale R$ 515; com spread de 5% e IOF de 3,5%, a fatura vem cerca de R$ 559,68. Com spread zero, R$ 533,03.</dd></div>
+          <div><dt>Salas VIP</dt><dd>Espaços em aeroportos com comida, bebida e conforto. O acesso vem por programas como LoungeKey, Priority Pass, Dragon Pass e Visa Airport Companion. Cada cartão define quantos acessos são grátis.</dd></div>
+          <div><dt>Cartão adicional</dt><dd>Cartão extra na mesma conta, para familiares. Os gastos somam na fatura e na meta de isenção; nem sempre tem os mesmos benefícios do titular.</dd></div>
+          <div><dt>Limite</dt><dd>Valor máximo que o banco libera para gastos no cartão. Cartões de categoria alta costumam exigir limite mínimo, renda ou investimentos.</dd></div>
+        </dl>
+        <div class="readmore" style="margin-top:14px">
+          <a href="https://idec.org.br/dicas-e-direitos/teto-de-juros-do-cartao-de-credito-conheca-mudancas-nos-limites-do-rotativo" target="_blank" rel="noopener">Teto de juros do rotativo (Idec)</a>
+          <a href="https://www.infomoney.com.br/?p=162690" target="_blank" rel="noopener">Termos usados no mercado de cartões (InfoMoney)</a>
+        </div>
+      </section>
+    </div>
+  </details>
+</div>
+
+<div class="tray" id="tray" hidden></div>
+
+<script type="application/json" id="dados-cartoes">{"meta":{"atualizado":"2026-10-14","dolarReferencia":5.15,"iofExterior":3.5,"observacao":"Valores pesquisados em fontes públicas (sites dos emissores e portais especializados) em outubro de 2026. Promoções temporárias não entram no cálculo."},"cartoes":[{"id":"nubank","nome":"Nubank Mastercard","banco":"Nubank","bandeira":"Mastercard","categoria":"Gold/Platinum","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","recompensa":"nenhuma","programa":"Sem programa de pontos no cartão padrão","spread":null,"iof":false,"vip":0,"vipTxt":"Sem acesso a salas VIP.","indicado":"Quem quer um cartão simples, sem custo, controlado pelo app. Bom ponto de partida e base de comparação.","atencao":"Não devolve nada nas compras. Para quem gasta mais de R$ 3 mil por mês, quase qualquer cartão com cashback rende mais.","fonteNome":"Nubank","fonteUrl":"https://nubank.com.br/cartao-de-credito/","conf":"baixa"},{"id":"mercadopago","nome":"Mercado Pago Visa Gold","banco":"Mercado Pago","bandeira":"Visa","categoria":"Gold","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade e sem meta de gastos.","recompensa":"cashback","programa":"Cashback em Meli Dólar para assinantes Meli+: até 0,5% nas compras em geral, até 3% no Mercado Livre e até 10% em parceiros, conforme oferta. Sem Meli+, não há cashback","spread":0,"iof":false,"vip":0,"vipTxt":"Sem acesso a salas VIP.","indicado":"Quem compra muito no Mercado Livre, já assina o Meli+ e quer um cartão sem anuidade e sem spread.","atencao":"O cálculo usa 0,5% e supõe que você já assina o Meli+; sem a assinatura, o retorno é zero. O custo da assinatura não entra na conta.","fonteNome":"Cartões e Viagens","fonteUrl":"https://cartoeseviagens.com.br/cartoes-banco-mercado-pago","conf":"media","req":{"txt":"Cashback só para assinantes do Meli+ (assinatura paga do Mercado Livre)"},"cbNac":0.5,"cbInt":0.5,"descontos":"Até 3% de volta no Mercado Livre e até 10% em parceiros (assinantes Meli+)"},{"id":"amazonprime","nome":"Amazon Prime Mastercard Platinum","banco":"Bradesco","bandeira":"Mastercard","categoria":"Platinum","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"txt":"Voltado a membros Amazon Prime"},"recompensa":"cashback","cbNac":1,"cbInt":2,"programa":"Cashback: 1% geral; 2% em compras internacionais, restaurantes, farmácias, entretenimento e viagens; 5% na Amazon.com.br","spread":5.3,"iof":false,"vip":0,"vipTxt":"Sem acesso a salas VIP.","descontos":"5% de volta em compras na Amazon.com.br","indicado":"Quem compra muito na Amazon e quer cashback sem pagar anuidade.","atencao":"Os 2% em categorias e 5% na Amazon não entram no cálculo; o saldo usa 1% como piso.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"alta"},{"id":"recargapayblack","nome":"RecargaPay Mastercard Black","banco":"RecargaPay","bandeira":"Mastercard","categoria":"Black","faixa":"entrada","anuidade":599,"isen100":5000,"isenTxt":"Parcela da anuidade zerada no mês com fatura acima de R$ 5 mil.","recompensa":"cashback","cbNac":1.5,"programa":"1,5% de cashback em todas as compras","spread":0,"iof":false,"vip":2,"vipTxt":"2 acessos/ano no LoungeKey + sala Mastercard Black em Guarulhos (ilimitada).","indicado":"Quem gasta a partir de R$ 5 mil por mês e quer cashback alto, sem spread em compras no exterior.","atencao":"Não permite cartões adicionais.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"alta"},{"id":"recargapaytitan","nome":"RecargaPay Titan Mastercard Black","banco":"RecargaPay","bandeira":"Mastercard","categoria":"Black","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"inv":30000,"txt":"Investir a partir de R$ 30 mil em CDB da RecargaPay"},"recompensa":"cashback","cbNac":2,"programa":"2% de cashback em todas as compras","spread":0,"iof":false,"vip":2,"vipTxt":"2 acessos/ano no LoungeKey + sala Mastercard Black em Guarulhos (ilimitada).","indicado":"Quem tem R$ 30 mil para deixar aplicado e quer o maior cashback fixo sem anuidade.","atencao":"Exige o investimento em CDB mantido. Não permite adicionais.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"alta"},{"id":"genial","nome":"Genial Mastercard Black","banco":"Genial Investimentos","bandeira":"Mastercard","categoria":"Black","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"inv":50000,"txt":"Correntista com investimentos a partir de R$ 50 mil"},"recompensa":"cashback","cbNac":1,"programa":"1% da fatura em pontos Genial Fidelidade (transferíveis para Smiles, Azul ou Livelo)","spread":null,"iof":false,"vip":8,"vipMinGasto":6000,"vipTxt":"8 acessos/ano no LoungeKey + sala Mastercard Black em Guarulhos. Acesso gratuito exige gasto médio de R$ 6 mil/mês, R$ 20 mil na última fatura ou R$ 200 mil investidos.","indicado":"Investidor que quer cartão Black sem anuidade com salas VIP e pontos transferíveis.","atencao":"As salas VIP só saem de graça se cumprir a meta de gasto ou investimento.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"media"},{"id":"xpinfinite","nome":"XP Visa Infinite","banco":"XP Investimentos","bandeira":"Visa","categoria":"Infinite","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"inv":5000,"txt":"Cliente XP com investimentos (a partir de R$ 5 mil)"},"recompensa":"cashback","cbNac":1,"faixas":[[0,0],[1500,0.5],[3000,1]],"programa":"Investback de 0,5% (faturas de R$ 1,5 mil a R$ 3 mil) ou 1% (acima de R$ 3 mil), ou pontos XP, à escolha","spread":4,"iof":false,"vip":4,"vipTxt":"4 acessos/ano no Dragon Pass.","indicado":"Quem já investe na XP e quer um Infinite gratuito com cashback que vira investimento.","atencao":"Faturas abaixo de R$ 1,5 mil não rendem nada.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"media","alt":{"recompensa":"pontos","ptsNac":2.2,"ptsInt":2.2,"txt":"Até 2,2 pontos XP por dólar (transferíveis para a Livelo)"}},{"id":"rico","nome":"Rico Visa Infinite","banco":"Rico","bandeira":"Visa","categoria":"Infinite","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"inv":1000,"txt":"Investimentos a partir de R$ 1 mil na Rico"},"recompensa":"cashback","cbNac":1,"faixas":[[0,0],[1500,0.5],[3000,1]],"programa":"0,5% de investback (ou 1 ponto/US$) em faturas de R$ 1,5 mil a R$ 3 mil; 1% (ou 1,6 ponto/US$ Livelo) acima de R$ 3 mil","spread":null,"iof":false,"vip":2,"vipTxt":"Visa Airport Companion: 2 acessos/ano com R$ 15–50 mil investidos; 4 acima de R$ 50 mil.","indicado":"Quem está começando a investir e quer um Visa Infinite sem custo.","atencao":"Salas VIP dependem do valor investido.","fonteNome":"Passageiro de Primeira – Black/Infinite sem anuidade","fonteUrl":"https://passageirodeprimeira.com/cartoes-black-infinite-anuidade/","conf":"media","alt":{"recompensa":"pontos","ptsNac":1.6,"ptsInt":1.6,"faixas":[[0,0],[1500,1],[3000,1.6]],"txt":"1 ponto Livelo por dólar (faturas de R$ 1,5 mil a R$ 3 mil) ou 1,6 acima de R$ 3 mil"}},{"id":"nomad","nome":"Nomad Explorer Visa Infinite","banco":"Nomad","bandeira":"Visa","categoria":"Infinite","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"inv":5200,"txt":"Investimentos a partir de US$ 1 mil na Nomad"},"recompensa":"pontos","ptsNac":1.6,"ptsInt":1.6,"programa":"1,6 pt/US$ (US$ 1 mil investidos), 2 pts (US$ 2,5 mil) ou 3 pts (US$ 5 mil). Programa Nomad e Livelo","spread":null,"iof":false,"vip":4,"vipTxt":"4 acessos/ano no Visa Airport Companion + sala VIP Nomad em Guarulhos (ilimitada).","indicado":"Quem viaja ao exterior, já usa conta global e quer pontos sem pagar anuidade.","atencao":"A pontuação sobe com o valor investido em dólar; o cálculo usa a faixa inicial.","fonteNome":"Passageiro de Primeira – Black/Infinite sem anuidade","fonteUrl":"https://passageirodeprimeira.com/cartoes-black-infinite-anuidade/","conf":"media"},{"id":"interblack","nome":"Inter Mastercard Black","banco":"Inter","bandeira":"Mastercard","categoria":"Black","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"txt":"Uma das vias: assinatura anual do Duo Gourmet, R$ 250 mil investidos, gastos ou comunidades de investimento"},"recompensa":"cashback","cbNac":1,"programa":"Inter Loop: 1 ponto a cada R$ 2,50 (equivale a cerca de 1% de cashback); troca por cashback ou milhas","spread":null,"iof":false,"vip":6,"vipTxt":"6 acessos/ano no Priority Pass (titular) + salas Inter + sala Mastercard Black em Guarulhos.","indicado":"Quem quer cartão Black sem anuidade e aceita assinar o Duo Gourmet para conseguir.","atencao":"Pela via Duo Gourmet há custo da assinatura do clube; os acessos não valem para adicionais.","fonteNome":"Passageiro de Primeira / Cartões e Viagens","fonteUrl":"https://cartoeseviagens.com.br/cartoes-banco-inter","conf":"media"},{"id":"bradescoblack0","nome":"Bradesco Mastercard Black (sem anuidade)","banco":"Bradesco","bandeira":"Mastercard","categoria":"Black","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"txt":"Correntista Bradesco"},"recompensa":"nenhuma","programa":"Não pontua","spread":null,"iof":false,"vip":2,"vipTxt":"2 acessos/ano no LoungeKey + sala Mastercard Black em Guarulhos.","indicado":"Correntista Bradesco que quer os seguros e benefícios Black sem pagar nada.","atencao":"Não acumula pontos nem cashback.","fonteNome":"Passageiro de Primeira – Black/Infinite sem anuidade","fonteUrl":"https://passageirodeprimeira.com/cartoes-black-infinite-anuidade/","conf":"media"},{"id":"itaupersonnalite","nome":"Itaú Personnalité Visa Infinite / Mastercard Black","banco":"Itaú","bandeira":"Visa/Mastercard","categoria":"Infinite/Black","faixa":"intermediario","anuidade":1056,"isenTxt":"Anuidade gratuita a partir do nível 2 do programa Minhas Vantagens (relacionamento com o banco).","req":{"txt":"Correntista do segmento Personnalité"},"recompensa":"pontos","ptsNac":2,"ptsInt":3,"programa":"Itaú Shop: 2 pts/US$ no Brasil, 3 pts/US$ no exterior","spread":5.5,"iof":false,"vip":2,"vipTxt":"2 acessos/ano (LoungeKey no Black ou Visa Airport Companion no Infinite) + sala Mastercard Black em GRU (versão Black).","indicado":"Correntista Personnalité que já tem relacionamento para isentar a anuidade.","atencao":"Pontuação modesta para a anuidade cheia; vale principalmente com isenção.","fonteNome":"Passageiro de Primeira – Black/Infinite sem anuidade","fonteUrl":"https://passageirodeprimeira.com/cartoes-black-infinite-anuidade/","conf":"media"},{"id":"nubankuv","nome":"Nubank Ultravioleta","banco":"Nubank","bandeira":"Mastercard","categoria":"Black","faixa":"intermediario","anuidade":1068,"isen100":8000,"isenInv":50000,"isenTxt":"Isento com gasto mensal a partir de R$ 8 mil ou R$ 50 mil investidos no Nubank.","recompensa":"cashback","cbNac":1.25,"programa":"1,25% de cashback; os pontos também podem ser transferidos para LATAM Pass, Azul e Smiles. 5% de volta no Nu Viagens","spread":3.5,"iof":"cashback","iofTxt":"IOF devolvido como cashback na fatura em até 7 dias.","vip":4,"vipTxt":"4 acessos/ano no Priority Pass + sala Nubank Ultravioleta e sala Mastercard Black em Guarulhos (ilimitadas).","indicado":"Quem gasta de R$ 8 mil por mês para cima, quer cashback simples e compra no exterior.","atencao":"Adicionais não têm os mesmos benefícios. Sem a isenção, a anuidade come o cashback de quem gasta pouco.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"alta"},{"id":"picpayepic","nome":"PicPay Epic Mastercard Black","banco":"PicPay","bandeira":"Mastercard","categoria":"Black","faixa":"intermediario","anuidade":1068,"isen100":5000,"isenInv":50000,"isenTxt":"Isento com faturas acima de R$ 5 mil ou investimentos acima de R$ 50 mil.","req":{"renda":15000,"txt":"Renda mensal a partir de R$ 15 mil"},"recompensa":"cashback","cbNac":1.3,"cbInt":4,"programa":"1,3% de cashback no Brasil e 4% no exterior, rendendo 102% do CDI","spread":5,"iof":false,"vip":2,"vipTxt":"2 acessos/ano no LoungeKey + sala Mastercard Black em Guarulhos.","descontos":"Amazon Prime, tag Sem Parar, pronto atendimento Einstein; compras internacionais em até 3x","indicado":"Quem gasta pelo menos R$ 5 mil por mês, tem renda de R$ 15 mil e faz compras no exterior.","atencao":"Exige renda comprovada de R$ 15 mil.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"alta"},{"id":"santanderunique","nome":"Santander Unique (Visa Infinite / Mastercard Black)","banco":"Santander","bandeira":"Visa/Mastercard","categoria":"Infinite/Black","faixa":"intermediario","anuidade":1050,"isenTxt":"Isenção ao cumprir 2 de 3 critérios: fatura acima de R$ 8 mil, investimentos no banco e pacote de serviços ativo.","req":{"txt":"Correntista Santander"},"recompensa":"cashback","cbNac":1.2,"programa":"1,2% de cashback","spread":6,"iof":false,"vip":2,"vipTxt":"2 acessos/ano (LoungeKey ou Visa Airport Companion) + sala Mastercard Black em GRU na versão Black.","indicado":"Correntista Santander que bate os critérios de isenção.","atencao":"A isenção exige combinação de critérios; o cálculo assume anuidade cheia.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"media"},{"id":"bvunico","nome":"BV Único Visa Infinite","banco":"Banco BV","bandeira":"Visa","categoria":"Infinite","faixa":"intermediario","anuidade":718,"isen100":10000,"isenTxt":"Anuidade gratuita com gasto a partir de R$ 10 mil por mês.","recompensa":"cashback","cbNac":1.5,"faixas":[[0,0.3],[3000.01,0.6],[6000.01,0.8],[10000.01,1.5]],"programa":"Cashback progressivo: 0,3% até R$ 3 mil; 0,6% até R$ 6 mil; 0,8% até R$ 10 mil; 1,5% acima","spread":5,"iof":false,"vip":2,"vipTxt":"2 acessos/ano no LoungeKey.","indicado":"Quem gasta acima de R$ 10 mil e quer 1,5% de volta com anuidade zerada.","atencao":"Abaixo de R$ 10 mil o cashback cai bastante e a anuidade é cobrada.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"alta"},{"id":"btgblack","nome":"BTG Pactual Black","banco":"BTG Pactual","bandeira":"Mastercard","categoria":"Black","faixa":"intermediario","anuidade":1080,"isen100":9000,"isenTxt":"R$ 10 de desconto na mensalidade a cada R$ 1 mil gastos ou R$ 10 mil investidos. Zera com cerca de R$ 9 mil/mês.","recompensa":"cashback","cbNac":1,"programa":"1% de cashback ou 2,2 pontos por dólar (Livelo/Esfera), à escolha do cliente","spread":6,"iof":true,"iofTxt":"IOF zero em compras internacionais.","vip":4,"vipTxt":"4 acessos/ano no Dragon Pass + sala Mastercard Black em Guarulhos.","indicado":"Quem compra no exterior e gasta perto de R$ 9 mil por mês.","atencao":"O desconto é proporcional: com R$ 4 mil de gasto, paga mais da metade da anuidade.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"alta","alt":{"recompensa":"pontos","ptsNac":2.2,"ptsInt":2.2,"txt":"2,2 pontos por dólar (Livelo ou Esfera)"}},{"id":"c6carbon","nome":"C6 Carbon Mastercard Black","banco":"C6 Bank","bandeira":"Mastercard","categoria":"Black","faixa":"intermediario","anuidade":1176,"isen100":8000,"isenInv":50000,"isenTxt":"Isento com fatura a partir de R$ 8 mil ou R$ 50 mil em renda fixa no C6.","recompensa":"pontos","ptsNac":2.5,"ptsInt":2.5,"programa":"Átomos: 2,5 pts/US$ (até 3,5 conforme investimentos no banco). Pontos não expiram; transferíveis para Livelo e companhias","spread":null,"iof":false,"vip":4,"vipTxt":"4 acessos/ano no Dragon Pass (ilimitados com fatura acima de R$ 20 mil ou R$ 1 milhão investido) + sala Mastercard Black em Guarulhos.","indicado":"Quem gasta R$ 8 mil ou mais e quer pontos transferíveis em banco digital.","atencao":"As regras de sala VIP ficaram mais restritas em 2026.","fonteNome":"Melhores Cartões / Passageiro de Primeira","fonteUrl":"https://www.melhorescartoes.com.br/c6-bank-oferece-anuidade-gratis-c6-carbon-jul26.html","conf":"alta"},{"id":"caixainfinite","nome":"CAIXA Visa Infinite","banco":"CAIXA","bandeira":"Visa","categoria":"Infinite","faixa":"intermediario","anuidade":828,"isen50":4000,"isen100":8000,"isenTxt":"50% de volta na parcela com gasto acima de R$ 4 mil; 100% acima de R$ 8 mil.","req":{"txt":"Limite mínimo aprovado de R$ 15 mil na CAIXA (não precisa ser correntista)"},"recompensa":"pontos","ptsNac":2.3,"ptsInt":3.2,"programa":"Pontos CAIXA: 2,3 pts/US$ no Brasil, 3,2 no exterior","spread":4,"iof":"cashback","iofTxt":"100% do IOF devolvido na fatura em até 45 dias (exige cadastro na campanha Visa).","vip":2,"vipTxt":"2 acessos/ano no Visa Airport Companion.","indicado":"Quem gasta R$ 8 mil por mês e quer devolução do IOF com anuidade zerada.","atencao":"O reembolso do IOF depende de cadastro em campanha, que pode mudar.","fonteNome":"Passageiro de Primeira – IOF zero","fonteUrl":"https://passageirodeprimeira.com/cartoes-credito-iof-zero/","conf":"alta"},{"id":"portoinfinite","nome":"Porto Bank Visa Infinite / Mastercard Black","banco":"Porto Bank","bandeira":"Visa/Mastercard","categoria":"Infinite/Black","faixa":"intermediario","anuidade":1068,"isen100":10000,"isenInv":100000,"isenTxt":"Anuidade gratuita com fatura acima de R$ 10 mil ou R$ 100 mil em fundos Porto Bank.","recompensa":"pontos","ptsNac":2.5,"ptsInt":2.5,"faixas":[[0,2.5],[20000,3.5]],"programa":"PortoPlus: 2,5 pts/US$ em faturas até R$ 19.999; 3,5 acima de R$ 20 mil","spread":5.75,"iof":"cashback","iofTxt":"100% do IOF devolvido, limitado a R$ 50 mil por mês (aceite no app Porto).","vip":10,"vipTxt":"10 acessos/ano (Visa Airport Companion no Infinite, LoungeKey no Black) + sala Mastercard Black em GRU.","descontos":"Descontos em seguros e serviços Porto","indicado":"Quem gasta R$ 10 mil por mês, viaja ao exterior e é cliente Porto Seguro.","atencao":"O spread de 5,75% reduz a vantagem do IOF devolvido.","fonteNome":"Passageiro de Primeira – IOF zero","fonteUrl":"https://passageirodeprimeira.com/cartoes-credito-iof-zero/","conf":"alta"},{"id":"azulitau","nome":"Azul Itaú Visa Infinite / Skyline Mastercard Black","banco":"Itaú","bandeira":"Visa/Mastercard","categoria":"Infinite/Black","faixa":"intermediario","anuidade":1260,"isen50":10000,"isen100":20000,"isenTxt":"50% de desconto com fatura acima de R$ 10 mil; 100% acima de R$ 20 mil.","recompensa":"milhas","ptsNac":3,"ptsInt":3.5,"programa":"Azul Fidelidade: 3 pts/US$ no Brasil e 3,5 no exterior (4,5 e 5,25 para assinantes do Clube Azul). Pontos não expiram","spread":null,"iof":false,"vip":2,"vipTxt":"2 acessos/ano no Visa Airport Companion.","cia":"Azul","status":"Categoria Diamante automática no Azul Fidelidade (titular)","upgrade":"2 vouchers de upgrade de cabine ao acumular 100 mil pontos no cartão em 12 meses","descontos":"10% de desconto em passagens Azul; 3 bagagens grátis em voos domésticos e para EUA/Europa; passagem cortesia ao acumular 50 mil pontos","indicado":"Quem voa pela Azul e quer status Diamante, bagagem grátis e chance de upgrade.","atencao":"Benefícios só fazem sentido para quem voa Azul. Isenção total exige R$ 20 mil por mês.","fonteNome":"Passageiro de Primeira / Cartões Alta Renda","fonteUrl":"https://cartoesaltarenda.com/azul-itau-vs-gol-smiles-bb-vs-latam-pass-2026/","conf":"alta"},{"id":"latamitau","nome":"LATAM Pass Itaú Visa Infinite / Mastercard Black","banco":"Itaú","bandeira":"Visa/Mastercard","categoria":"Infinite/Black","faixa":"intermediario","anuidade":1356,"isen50":10000,"isen100":20000,"isenTxt":"Mensalidade de R$ 113; 50% de desconto com fatura acima de R$ 10 mil e isenção acima de R$ 20 mil. Na versão Personnalité, isento com R$ 3 milhões investidos.","recompensa":"milhas","ptsNac":2.5,"ptsInt":3.5,"programa":"LATAM Pass: 2,5 milhas/US$ no Brasil e 3,5 no exterior (mais em campanhas para assinantes do Clube)","spread":null,"iof":false,"vip":2,"vipTxt":"Salas VIP LATAM ilimitadas ao voar LATAM + 2 acessos/ano no Visa Airport Companion (Infinite). Black: sala Mastercard Black em GRU.","cia":"LATAM","status":"Parte dos pontos conta como qualificável para categoria Elite (2 a cada 10)","upgrade":"6 cupons de upgrade de cabine por ano em voos LATAM","descontos":"30% de desconto na compra de pontos LATAM Pass; passagens LATAM em até 10x","indicado":"Quem voa pela LATAM e quer upgrade para a cabine executiva e acesso às salas da companhia.","atencao":"Upgrades dependem de disponibilidade. Acúmulo regular é menor que o de cartões de banco.","fonteNome":"Itaú / Cartões Alta Renda","fonteUrl":"https://www.itau.com.br/personnalite/cartoes/cartao-de-credito-latam-pass-visa-infinite","conf":"alta"},{"id":"smilesbb","nome":"GOL Smiles Visa Infinite","banco":"Banco do Brasil","bandeira":"Visa","categoria":"Infinite","faixa":"intermediario","anuidade":1188,"isen100":15000,"isenTxt":"Programa Usou, Zerou: parcela zerada com R$ 15 mil de gasto no mês.","recompensa":"milhas","ptsNac":3,"ptsInt":3,"programa":"Smiles: 3 milhas/US$ (5,5 para assinantes do Clube Smiles ou categoria Diamante)","spread":null,"iof":false,"vip":0,"vipTxt":"Consulte as regras atuais do cartão.","cia":"GOL","status":"Consulte o regulamento atual","descontos":"Bônus de adesão periódicos para assinantes do Clube Smiles","indicado":"Quem concentra viagens na GOL e assina o Clube Smiles, onde chega a 5,5 milhas/US$.","atencao":"A vantagem de acúmulo depende da assinatura do Clube Smiles.","fonteNome":"Cartões Alta Renda","fonteUrl":"https://cartoesaltarenda.com/azul-itau-vs-gol-smiles-bb-vs-latam-pass-2026/","conf":"media"},{"id":"tapbtg","nome":"TAP BTG Pactual Black","banco":"BTG Pactual","bandeira":"Mastercard","categoria":"Black","faixa":"intermediario","anuidade":1200,"isen100":10000,"isenTxt":"Gratuita com fatura acima de R$ 10 mil (ou R$ 10 de desconto a cada R$ 1 mil gastos).","recompensa":"milhas","ptsNac":2.5,"ptsInt":3.5,"programa":"TAP Miles&Go: 2,5 milhas/US$ no Brasil, 3,5 no exterior e 4 no site da TAP","spread":6,"iof":true,"iofTxt":"IOF zero em compras internacionais.","vip":4,"vipTxt":"4 acessos/ano no LoungeKey + 3 acessos ao TAP Premium Lounge em Lisboa + sala Mastercard Black em GRU.","cia":"TAP","descontos":"Bônus de 45 mil milhas com gasto de R$ 20 mil nas 3 primeiras faturas","indicado":"Quem viaja para a Europa pela TAP e quer IOF zero sem precisar ser correntista.","atencao":"Milhas TAP servem melhor para voos à Europa; spread de 6%.","fonteNome":"Passageiro de Primeira – IOF zero","fonteUrl":"https://passageirodeprimeira.com/cartoes-credito-iof-zero/","conf":"alta"},{"id":"santanderunlimited","nome":"Santander Unlimited (Visa Infinite / Mastercard Black)","banco":"Santander","bandeira":"Visa/Mastercard","categoria":"Infinite/Black","faixa":"alta","anuidade":2200,"isen100":30000,"isenTxt":"Anuidade gratuita com gastos acima de R$ 30 mil.","req":{"txt":"Correntista Santander (Select ou Private)"},"recompensa":"pontos","ptsNac":3,"ptsInt":3.5,"programa":"Esfera: 3 pts/US$ no Brasil e 3,5 no exterior (Select); até 6 com o Santander Rewards","spread":6,"iof":false,"vip":99,"vipMinGasto":10000,"vipTxt":"LoungeKey ou Visa Airport Companion ilimitados + 8 convidados/ano. Exige R$ 30 mil de gasto por trimestre.","indicado":"Correntista Santander que gasta R$ 30 mil por mês e quer salas VIP ilimitadas.","atencao":"Salas VIP condicionadas a R$ 30 mil por trimestre; convidados não valem para adicionais.","fonteNome":"Passageiro de Primeira – pontos e milhas","fonteUrl":"https://passageirodeprimeira.com/melhores-cartoes-pontos-milhas/","conf":"alta"},{"id":"sicredi","nome":"Sicredi Visa Infinite","banco":"Sicredi","bandeira":"Visa","categoria":"Infinite","faixa":"intermediario","anuidade":1500,"isen50":17000,"isen100":25000,"isenTxt":"Até R$ 1.500 (varia por cooperativa). 50% de isenção a partir de R$ 17 mil; 100% a partir de R$ 25 mil.","req":{"txt":"Associado de cooperativa Sicredi"},"recompensa":"pontos","ptsNac":3,"ptsInt":3,"programa":"3 pts/US$","spread":null,"iof":false,"vip":99,"vipTxt":"LoungeKey e Dragon Pass ilimitados ao portador + convidados.","indicado":"Cooperado Sicredi que quer salas VIP ilimitadas sem pagar anuidade alta.","atencao":"Valores e regras variam de cooperativa para cooperativa.","fonteNome":"Passageiro de Primeira – salas VIP","fonteUrl":"https://passageirodeprimeira.com/cartoes-de-credito-sala-vip/","conf":"media"},{"id":"amexplatinum","nome":"Bradesco American Express The Platinum Card","banco":"Bradesco","bandeira":"American Express","categoria":"Platinum","faixa":"alta","anuidade":1992,"isenTxt":"Sem política de isenção a partir do 2º ano (campanhas pontuais zeram o 1º ano).","recompensa":"pontos","ptsNac":2.2,"ptsInt":3,"programa":"2,2 pts/US$ no Brasil e 3 no exterior; pontos não expiram","spread":null,"iof":false,"vip":99,"vipTxt":"Centurion Lounge e Bradesco Cartões Lounge ilimitados (+1 acompanhante); Delta Sky Club ao voar Delta.","descontos":"Status em locadoras (Hertz Five Stars, SIXT Platinum) e hotéis parceiros","indicado":"Quem viaja muito por Guarulhos e EUA e valoriza as salas Centurion.","atencao":"Anuidade sem isenção. Aceitação da bandeira Amex é menor no comércio.","fonteNome":"Alta Renda Blog / Passageiro de Primeira","fonteUrl":"https://passageirodeprimeira.com/cartao-de-credito/american-express-the-platinum-card","conf":"media"},{"id":"caixaicone","nome":"CAIXA Ícone Visa Infinite","banco":"CAIXA","bandeira":"Visa","categoria":"Infinite","faixa":"alta","anuidade":1650,"isen50":12500,"isen100":25000,"isenTxt":"50% de volta na parcela com gasto acima de R$ 12,5 mil; 100% acima de R$ 25 mil.","req":{"inv":1000000,"txt":"Correntista com investimentos acima de R$ 1 milhão (ou limite mínimo de R$ 100 mil, conforme a fonte)"},"recompensa":"pontos","ptsNac":5,"ptsInt":6,"programa":"Pontos CAIXA: 5 pts/US$ no Brasil, 6 no exterior","spread":4,"iof":"cashback","iofTxt":"100% do IOF devolvido na fatura em até 45 dias (cadastro na campanha Visa).","vip":99,"vipTxt":"LoungeKey e Visa Airport Companion ilimitados ao portador + 20 convidados/ano.","indicado":"Quem tem patrimônio alto e quer pontuação de topo com anuidade baixa.","atencao":"Acesso restrito a clientes de alta renda da CAIXA.","fonteNome":"Passageiro de Primeira – pontos e milhas","fonteUrl":"https://passageirodeprimeira.com/melhores-cartoes-pontos-milhas/","conf":"alta"},{"id":"altusliv","nome":"Banco do Brasil Altus Liv Visa Infinite","banco":"Banco do Brasil","bandeira":"Visa","categoria":"Infinite","faixa":"alta","anuidade":3600,"isen50":15000,"isen100":25000,"isenInv":2000000,"isenTxt":"50% de isenção acima de R$ 15 mil; 100% acima de R$ 25 mil ou R$ 2 milhões investidos.","req":{"inv":1000000,"gasto":20000,"renda":30000,"txt":"Correntista com R$ 1 milhão investido, gasto médio acima de R$ 20 mil ou renda de R$ 30 mil"},"recompensa":"pontos","ptsNac":4,"ptsInt":4,"faixas":[[0,3],[15000,3.5],[25000,4]],"programa":"Livelo: 3 pts/US$ até R$ 15 mil; 3,5 até R$ 25 mil; 4 acima; 4 no exterior","spread":4,"iof":true,"iofTxt":"IOF zero em compras internacionais.","vip":99,"vipTxt":"LoungeKey e Dragon Pass ilimitados ao portador + 12 acompanhantes/ano.","indicado":"Quem gasta R$ 25 mil por mês, viaja ao exterior e quer IOF zero com salas ilimitadas.","atencao":"Anuidade alta para quem não bate a meta de gastos.","fonteNome":"Passageiro de Primeira – salas VIP","fonteUrl":"https://passageirodeprimeira.com/cartoes-de-credito-sala-vip/","conf":"alta","intFixo":true},{"id":"unicredimpar","nome":"Unicred Ímpar Visa Infinite","banco":"Unicred","bandeira":"Visa","categoria":"Infinite","faixa":"alta","anuidade":3000,"isen100":40000,"isenInv":3000000,"isenTxt":"3 primeiros meses grátis; depois isento com faturas a partir de R$ 40 mil ou R$ 3 milhões investidos.","req":{"txt":"Cooperado Unicred"},"recompensa":"pontos","ptsNac":3.5,"ptsInt":4.5,"programa":"Unico/Livelo: 3,5 pts/US$ no Brasil e 4,5 no exterior","spread":0,"iof":false,"vip":99,"vipTxt":"LoungeKey e Visa Airport Companion ilimitados + 1 acompanhante por visita.","indicado":"Cooperado com gasto alto que viaja ao exterior: spread zero e salas ilimitadas.","atencao":"Exige ser cooperado (comum entre profissionais de saúde e liberais).","fonteNome":"Passageiro de Primeira – salas VIP","fonteUrl":"https://passageirodeprimeira.com/cartoes-de-credito-sala-vip/","conf":"alta"},{"id":"aeternum","nome":"Bradesco Visa Aeternum","banco":"Bradesco","bandeira":"Visa","categoria":"Infinite","faixa":"alta","anuidade":2112,"isenInv":5000000,"isenTxt":"Anuidade gratuita para clientes com mais de R$ 5 milhões investidos.","req":{"inv":1000000,"convite":true,"txt":"Segmento Private / Prime de alta renda, mediante convite"},"recompensa":"pontos","ptsNac":4,"ptsInt":7,"programa":"Livelo: 4 pts/US$ no Brasil e 7 no exterior (desde agosto de 2026); pontos não expiram","spread":null,"iof":false,"vip":99,"vipTxt":"Visa Airport Companion ilimitado + 12 acompanhantes/ano; Bradesco Cartões Lounge ilimitado + 1 acompanhante.","indicado":"Cliente Bradesco de alta renda que gasta muito no exterior.","atencao":"Encerrou o acesso ao LoungeKey em 2026. Isenção só com patrimônio muito alto.","fonteNome":"Passageiro de Primeira","fonteUrl":"https://passageirodeprimeira.com/?p=541329","conf":"alta"},{"id":"itaulegend","nome":"Itaú Personnalité Mastercard World Legend","banco":"Itaú","bandeira":"Mastercard","categoria":"World Legend","faixa":"alta","anuidade":4000,"isen100":40000,"isenTxt":"Anuidade gratuita com gastos acima de R$ 40 mil.","req":{"txt":"Correntista Personnalité (Private tem versão de R$ 4.800)"},"recompensa":"pontos","ptsNac":4.5,"ptsInt":5,"programa":"Itaú Shop: 4,5 pts/US$ no Brasil e 5 no exterior (Private: 5 e 7)","spread":5.5,"iof":false,"vip":99,"vipTxt":"LoungeKey ilimitado + 2 acompanhantes por visita; sala Mastercard Black e Taste of Priceless em GRU.","indicado":"Correntista Itaú que gasta R$ 40 mil por mês e viaja com família.","atencao":"Abaixo de R$ 40 mil, a anuidade de R$ 4 mil é cobrada integralmente.","fonteNome":"Passageiro de Primeira – pontos e milhas","fonteUrl":"https://passageirodeprimeira.com/melhores-cartoes-pontos-milhas/","conf":"alta"},{"id":"ultrablue","nome":"BTG Pactual Ultrablue Mastercard Black","banco":"BTG Pactual","bandeira":"Mastercard","categoria":"Black","faixa":"alta","anuidade":4800,"isenInv":400000,"isenTxt":"Anuidade gratuita mantendo R$ 400 mil investidos no BTG.","req":{"inv":1000000,"txt":"Investimentos a partir de R$ 1 milhão no BTG"},"recompensa":"pontos","ptsNac":3,"ptsInt":3.5,"programa":"Pontos BTG ou Livelo: 3 pts/US$ no Brasil e 3,5 no exterior (ou 1,5%/1,75% de cashback)","spread":6,"iof":true,"iofTxt":"IOF zero em compras internacionais.","vip":99,"vipTxt":"LoungeKey e Dragon Pass ilimitados + 12 acompanhantes/ano + sala Mastercard Black em GRU.","indicado":"Investidor BTG que viaja ao exterior: IOF zero e salas ilimitadas sem pagar anuidade.","atencao":"Como o requisito de entrada é R$ 1 milhão, na prática a anuidade fica sempre isenta.","fonteNome":"Passageiro de Primeira – IOF zero","fonteUrl":"https://passageirodeprimeira.com/cartoes-credito-iof-zero/","conf":"alta","alt":{"recompensa":"cashback","cbNac":1.5,"cbInt":1.75,"txt":"1,5% de cashback no Brasil e 1,75% no exterior"}},{"id":"ultrabluelegend","nome":"BTG Pactual Ultrablue World Legend","banco":"BTG Pactual","bandeira":"Mastercard","categoria":"World Legend","faixa":"alta","anuidade":4800,"isen100":40000,"isenTxt":"Parcela zerada com faturas acima de R$ 40 mil. Sem isenção por investimento.","req":{"inv":3000000,"txt":"Investimentos a partir de R$ 3 milhões no BTG"},"recompensa":"pontos","ptsNac":4.5,"ptsInt":4.5,"programa":"Pontos BTG ou Livelo: 4,5 pts/US$ (ou 2% de cashback)","spread":6,"iof":true,"iofTxt":"IOF zero em compras internacionais.","vip":99,"vipTxt":"LoungeKey e Dragon Pass ilimitados + 12 acompanhantes/ano; W Premium; sala Mastercard Black e Taste of Priceless em GRU.","indicado":"Patrimônio alto, gasto acima de R$ 40 mil e muitas compras no exterior.","atencao":"Spread de 6%.","fonteNome":"Passageiro de Primeira – pontos e milhas","fonteUrl":"https://passageirodeprimeira.com/melhores-cartoes-pontos-milhas/","conf":"alta","alt":{"recompensa":"cashback","cbNac":2,"cbInt":2,"txt":"2% de cashback"}},{"id":"c6graphene","nome":"C6 Graphene World Legend","banco":"C6 Bank","bandeira":"Mastercard","categoria":"World Legend","faixa":"alta","anuidade":3960,"isenInv":5000000,"isenTxt":"Anuidade gratuita com R$ 5 milhões investidos.","req":{"inv":5000000,"txt":"Correntista com investimentos acima de R$ 5 milhões"},"recompensa":"pontos","ptsNac":4.5,"ptsInt":4.5,"programa":"Átomos: 4,5 pts/US$","spread":5.25,"iof":false,"vip":99,"vipTxt":"Dragon Pass e LoungeKey ilimitados + 1 acompanhante; W Premium; sala Mastercard Black em GRU.","indicado":"Cliente C6 com patrimônio acima de R$ 5 milhões.","atencao":"Exigência de entrada muito alta.","fonteNome":"Passageiro de Primeira – pontos e milhas","fonteUrl":"https://passageirodeprimeira.com/melhores-cartoes-pontos-milhas/","conf":"alta"},{"id":"brbdux","nome":"BRB DUX Visa Infinite","banco":"BRB","bandeira":"Visa","categoria":"Infinite","faixa":"alta","anuidade":4800,"isen100":50000,"isenTxt":"1º ano grátis; depois R$ 4.800 em 12x, isenta com gastos acima de R$ 50 mil.","req":{"txt":"Correntista BRB"},"recompensa":"pontos","ptsNac":5,"ptsInt":7,"programa":"Curtaí (Livelo para assinantes do Clube Dux+): 5 pts/US$ no Brasil e 7 no exterior","spread":4,"iof":false,"vip":99,"vipMinGasto":5000,"vipTxt":"Priority Pass, LoungeKey e Visa Airport Companion ilimitados + 3 acompanhantes por visita; sala BRB. Exige fatura mínima de R$ 5 mil (titular).","indicado":"Quem gasta R$ 50 mil por mês e quer a maior pontuação acessível com salas VIP para a família.","atencao":"Exige conta no BRB. Abaixo de R$ 50 mil paga R$ 4.800/ano.","fonteNome":"Passageiro de Primeira – salas VIP","fonteUrl":"https://passageirodeprimeira.com/cartoes-de-credito-sala-vip/","conf":"alta"},{"id":"xplegacy","nome":"XP Legacy Visa Infinite (cashback)","banco":"XP Investimentos","bandeira":"Visa","categoria":"Infinite","faixa":"alta","anuidade":4200,"isen100":40000,"isenInv":3000000,"isenTxt":"Isento com faturas a partir de R$ 40 mil ou R$ 3 milhões investidos.","req":{"inv":1000000,"txt":"Investimentos acima de R$ 1 milhão na XP"},"recompensa":"cashback","cbNac":1.5,"cbInt":5.3,"programa":"1,5% de cashback no Brasil e 5,3% no exterior (via Livelo)","spread":5,"iof":false,"vip":99,"vipTxt":"Visa Airport Companion ilimitado + 12 acompanhantes/ano.","indicado":"Investidor XP com muitos gastos no exterior: 5,3% de volta compensa o IOF.","atencao":"Pontos Livelo do cashback expiram em 24 meses.","fonteNome":"Passageiro de Primeira – ranking cashback","fonteUrl":"https://passageirodeprimeira.com/categoria-cartao-de-credito/cartoes-de-cashback/","conf":"alta"},{"id":"xpprivilege","nome":"XP Visa Infinite Privilege","banco":"XP Investimentos","bandeira":"Visa","categoria":"Infinite Privilege","faixa":"ultra","anuidade":18000,"isenTxt":"Sem política de isenção publicada.","req":{"convite":true,"txt":"Clientes de altíssimo patrimônio na XP, mediante convite"},"recompensa":"pontos","ptsNac":5,"ptsInt":11,"programa":"Livelo: 5 pts/US$ no Brasil; 7 no exterior + 4 de bônus IOF (11 no total). Versão cashback: 2,5% / 7%","spread":5,"iof":"cashback","iofTxt":"IOF devolvido em pontos (4 pts/US$ extras).","vip":99,"vipTxt":"Visa Airport Companion ilimitado + 20 acompanhantes; Visa Infinite Privilege Lounge.","descontos":"1 trajeto de helicóptero por ano em São Paulo; Meet & Greet em GRU","indicado":"Patrimônio muito alto e gasto internacional intenso.","atencao":"Anuidade de R$ 18 mil sem isenção.","fonteNome":"Passageiro de Primeira – IOF zero","fonteUrl":"https://passageirodeprimeira.com/cartoes-credito-iof-zero/","conf":"alta","alt":{"recompensa":"cashback","cbNac":2.5,"cbInt":7,"txt":"2,5% de cashback no Brasil e 7% no exterior (já com o bônus de IOF)"}},{"id":"itauprivate","nome":"Itaú Private Visa Infinite Privilege","banco":"Itaú","bandeira":"Visa","categoria":"Infinite Privilege","faixa":"ultra","anuidade":15000,"isenTxt":"Sem política de isenção publicada.","req":{"convite":true,"txt":"Clientes Itaú Private"},"recompensa":"pontos","ptsNac":5.5,"ptsInt":8,"programa":"Itaú Shop: 5,5 pts/US$ no Brasil e 8 no exterior","spread":5.5,"iof":false,"vip":99,"vipTxt":"Visa Airport Companion ilimitado + 20 acompanhantes/ano; Visa Infinite Privilege Lounge.","indicado":"Cliente Private do Itaú: maior pontuação nacional do mercado.","atencao":"Anuidade de R$ 15 mil sem isenção publicada.","fonteNome":"Passageiro de Primeira – pontos e milhas","fonteUrl":"https://passageirodeprimeira.com/melhores-cartoes-pontos-milhas/","conf":"alta"},{"id":"portoprivilege","nome":"Porto Bank Visa Infinite Privilege","banco":"Porto Bank","bandeira":"Visa","categoria":"Infinite Privilege","faixa":"ultra","anuidade":30000,"isenInv":30000000,"isenTxt":"50% de isenção com R$ 15 milhões em produtos Porto; 100% com R$ 30 milhões.","req":{"convite":true,"txt":"Convidados com investimentos no Porto Bank"},"recompensa":"pontos","ptsNac":5,"ptsInt":5,"programa":"PortoPlus: 5 pts/US$; bônus de adesão de 300 mil pontos","spread":5.75,"iof":true,"iofTxt":"Isenção automática do IOF, sem limite mensal.","vip":99,"vipTxt":"Visa Airport Companion ilimitado + 4 acompanhantes por visita; Visa Infinite Privilege Lounge.","indicado":"Patrimônio muito alto com gasto internacional elevado.","atencao":"Anuidade mais alta do mercado nacional.","fonteNome":"Passageiro de Primeira – pontos e milhas","fonteUrl":"https://passageirodeprimeira.com/melhores-cartoes-pontos-milhas/","conf":"alta"},{"id":"centurion","nome":"Bradesco American Express The Centurion Card","banco":"Bradesco","bandeira":"American Express","categoria":"Centurion","faixa":"ultra","anuidade":25000,"isenTxt":"Sem política de isenção. R$ 19.200 para correntistas Bradesco.","req":{"convite":true,"txt":"Somente por convite, para correntistas"},"recompensa":"pontos","ptsNac":5,"ptsInt":7,"programa":"Livelo e Membership Rewards: 5 pts/US$ no Brasil e 7 no exterior; bônus de 300 mil pontos","spread":5.3,"iof":false,"vip":99,"vipTxt":"Priority Pass ilimitado + 12 acompanhantes por visita; Centurion Lounge, Delta Sky Club, Bradesco Lounge, W Premium.","indicado":"Quem quer a maior rede de salas VIP do mercado e tem convite.","atencao":"Somente por convite; anuidade sem isenção.","fonteNome":"Passageiro de Primeira – salas VIP","fonteUrl":"https://passageirodeprimeira.com/cartoes-de-credito-sala-vip/","conf":"alta"},{"id":"bbinfinite","nome":"Ourocard Visa Infinite","banco":"Banco do Brasil","bandeira":"Visa","categoria":"Infinite","faixa":"intermediario","anuidade":996,"isen100":15000,"isenInv":250000,"isenTxt":"R$ 996 (12x de R$ 83). Isenta com R$ 15 mil de gastos no mês ou R$ 250 mil investidos no BB.","req":{"renda":10000,"txt":"Renda mínima informada de R$ 10 mil"},"recompensa":"pontos","ptsNac":2,"ptsInt":3,"programa":"Livelo: 2 pts/US$ no Brasil e 3 no exterior; pontos não expiram","alt":{"recompensa":"cashback","cbNac":1,"cbInt":1,"txt":"1% de cashback pelo Benefícios BB (confirme a disponibilidade com o banco)"},"spread":4,"iof":false,"vip":4,"vipTxt":"4 acessos/ano no Visa Airport Companion + até 4 acessos/ano à Casa BB em Guarulhos.","indicado":"Correntista do BB que gasta R$ 15 mil por mês ou tem R$ 250 mil investidos no banco.","atencao":"Abaixo de R$ 15 mil de gasto e sem investimento no BB, paga a anuidade cheia.","fonteNome":"Cartões e Viagens","fonteUrl":"https://cartoeseviagens.com.br/bb-ourocard-visa-infinite","conf":"media"},{"id":"bradescoinfinite","nome":"Bradesco Visa Infinite","banco":"Bradesco","bandeira":"Visa","categoria":"Infinite","faixa":"intermediario","anuidade":1260,"isen50":5000,"isen100":10000,"isenInv":250000,"isenTxt":"50% de desconto com gasto a partir de R$ 5 mil; isenta com R$ 10 mil por mês ou R$ 250 mil investidos no Bradesco.","req":{"txt":"Correntista Bradesco (renda sugerida de R$ 20 mil)"},"recompensa":"pontos","ptsNac":2,"ptsInt":2,"programa":"Livelo: 2 pts/US$ no Brasil e no exterior","spread":5.3,"iof":false,"vip":4,"vipTxt":"4 acessos/ano no Visa Airport Companion, sem acompanhantes gratuitos.","indicado":"Correntista Bradesco que gasta R$ 10 mil por mês e quer pontos Livelo com anuidade zerada.","atencao":"Pontuação baixa para a categoria; vale mais pela isenção fácil.","fonteNome":"Cartões e Viagens","fonteUrl":"https://cartoeseviagens.com.br/bradesco-visa-infinite","conf":"media"},{"id":"itauuniclass","nome":"Itaú Uniclass Visa Infinite / Mastercard Black","banco":"Itaú","bandeira":"Visa/Mastercard","categoria":"Infinite/Black","faixa":"intermediario","anuidade":1056,"isen100":8000,"isenInv":50000,"isenTxt":"Isenta no nível 4 do Minhas Vantagens: R$ 8 mil de gasto por fatura, R$ 50 mil investidos ou salário no Itaú. O valor da anuidade cheia não foi confirmado; o cálculo usa R$ 1.056 como referência.","req":{"txt":"Correntista do segmento Itaú Uniclass"},"recompensa":"pontos","ptsNac":2,"ptsInt":2,"faixas":[[0,2],[4000,2.5]],"programa":"Itaú Shop: 2 pts/US$; 2,5 com fatura a partir de R$ 4 mil (regra de julho de 2026, implantada até o fim do ano)","spread":5.5,"iof":false,"vip":4,"vipMinGasto":4000,"vipTxt":"4 acessos/ano para quem gasta a partir de R$ 4 mil por fatura.","indicado":"Correntista Uniclass que gasta a partir de R$ 4 mil e quer um Black/Infinite sem anuidade.","atencao":"Regras novas em implantação gradual; confirme com o gerente se já valem para você.","fonteNome":"Itaú (comunicado de 29/07/2026)","fonteUrl":"https://www.itau.com.br/media/dam/m/144e3f9526da94f4/original/29-07-2026-Clientes-Itau-Uniclass-passam-a-contar-com-ate-2-5-pontos-por-do-lar-gasto-e-4-acessos-anuais-em-salas-VIP-nos-carto-es-de-cre-dito-premium.pdf","conf":"baixa"},{"id":"sicoobblack","nome":"Sicoob Mastercard Black","banco":"Sicoob","bandeira":"Mastercard","categoria":"Black","faixa":"intermediario","anuidade":750,"isen50":5000,"isen100":10000,"isenTxt":"Cerca de R$ 750 a R$ 900 (varia por cooperativa). 50% de desconto a partir de R$ 5 mil de gasto; isenta a partir de R$ 10 mil.","req":{"txt":"Cooperado Sicoob"},"recompensa":"pontos","ptsNac":2.2,"ptsInt":2.2,"programa":"Coopera: 2,2 pts/US$; transferíveis para Livelo, LATAM Pass, Azul e Smiles. Pontos valem 24 meses","spread":0,"iof":false,"vip":0,"vipTxt":"Sala Mastercard Black em Guarulhos. LoungeKey é pago na versão tradicional (gratuito e ilimitado na versão Merit, para cooperados de maior relacionamento).","indicado":"Cooperado Sicoob que compra no exterior: spread zero e isenção a partir de R$ 10 mil.","atencao":"Condições variam de cooperativa para cooperativa.","fonteNome":"Cartões Alta Renda","fonteUrl":"https://cartoesaltarenda.com/cartao-sicoob-mastercard-black-review-completo-2026/","conf":"media"},{"id":"intergold","nome":"Inter Mastercard Gold","banco":"Inter","bandeira":"Mastercard","categoria":"Gold","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","recompensa":"cashback","cbNac":0.25,"programa":"Inter Loop: 1 ponto a cada R$ 10 com débito automático da fatura (cerca de 0,25%)","iof":false,"vip":0,"vipTxt":"Sem acesso a salas VIP.","indicado":"Quem quer um cartão gratuito com algum retorno e já usa a conta do Inter.","atencao":"O retorno exige débito automático da fatura.","fonteNome":"Melhores Cartões","fonteUrl":"https://www.melhorescartoes.com.br/cartao-inter-guia-completo-dos-cartoes-de-credito-do-superapp.html","conf":"media"},{"id":"interplatinum","nome":"Inter Mastercard Platinum","banco":"Inter","bandeira":"Mastercard","categoria":"Platinum","faixa":"entrada","anuidade":0,"isenTxt":"Sem anuidade.","req":{"txt":"Cliente Inter One ou gasto de R$ 5 mil nas últimas faturas do Gold"},"recompensa":"cashback","cbNac":0.5,"programa":"Inter Loop: 1 ponto a cada R$ 5 com débito automático da fatura (cerca de 0,5%)","iof":false,"vip":0,"vipTxt":"Sem acesso a salas VIP.","indicado":"Cliente Inter que gasta alguns milhares por mês e não quer pagar anuidade.","atencao":"Retorno baixo comparado a cartões com cashback de 1% ou mais.","fonteNome":"Melhores Cartões","fonteUrl":"https://www.melhorescartoes.com.br/cartao-inter-guia-completo-dos-cartoes-de-credito-do-superapp.html","conf":"media"},{"id":"santandersx","nome":"Santander SX Visa","banco":"Santander","bandeira":"Visa","categoria":"Internacional","faixa":"entrada","anuidade":0,"isenTxt":"Anuidade zerada no mês com R$ 100 em compras ou com CPF e celular cadastrados como chave Pix no Santander.","recompensa":"nenhuma","programa":"Não acumula pontos; dá acesso a descontos no programa Esfera","spread":6,"iof":false,"vip":0,"vipTxt":"Sem acesso a salas VIP.","indicado":"Quem quer um cartão básico de banco tradicional sem custo.","atencao":"Não devolve nada nas compras e tem spread de 6% no exterior.","fonteNome":"Cartões e Viagens","fonteUrl":"https://cartoeseviagens.com.br/cartao-santander-sx","conf":"media"}]}</script>
+<script>
+(function () {
+  "use strict";
+  var DADOS = JSON.parse(document.getElementById("dados-cartoes").textContent);
+  var CARTOES = DADOS.cartoes;
+  var META = DADOS.meta;
+  var IOF = (META.iofExterior || 3.5) / 100;
+  var STORE_KEY = "cartao-certo-perfil-v2";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var brl = function (n) { return (n < -0.5 ? "−" : "") + "R$ " + Math.round(Math.abs(n)).toLocaleString("pt-BR"); };
+  var pct = function (n) { return n.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) + "%"; };
+  var dec = function (n) { return n.toLocaleString("pt-BR", { maximumFractionDigits: 2 }); };
+  var mil = function (n) { return n >= 1000 ? Math.round(n / 1000).toLocaleString("pt-BR") + " mil" : Math.round(n).toLocaleString("pt-BR"); };
+  function parseNum(v) {
+    if (typeof v === "number") return v;
+    var s = String(v || "").replace(/[^\d,.-]/g, "");
+    if (s.indexOf(",") >= 0) s = s.replace(/\./g, "").replace(",", ".");
+    else if (/\.\d{3}($|\.)/.test(s)) s = s.replace(/\./g, "");
+    var n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+  function fmtInput(n) { return Math.round(n).toLocaleString("pt-BR"); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function spreadTxt() {
+    var dol = parseNum($("dolar").value) || META.dolarReferencia || 5.15;
+    var base = 100 * dol, iof = 1 + IOF;
+    var f = function (n) { return "R$ " + n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+    return "<b>Spread</b> é a margem que o banco cobra em cima da cotação do dólar quando você compra em moeda estrangeira (viagens, sites e assinaturas de fora). Ele se soma ao IOF. Exemplo com o dólar a " + f(dol) + ": uma compra de US$ 100 vale " + f(base) + ". Num cartão com spread de 5%, a fatura vem " + f(base * 1.05 * iof) + " (spread + IOF de 3,5%). Num cartão com <b>spread zero</b>, a mesma compra sai " + f(base * iof) + ". Quem compra pouco no exterior pode ignorar o spread.";
+  }
+  function brl100(c) {
+    var dol = parseNum($("dolar").value) || META.dolarReferencia || 5.15;
+    var sp = c.spread != null ? c.spread : 5;
+    var iofZero = c.iof === true || c.iof === "cashback";
+    var v = 100 * dol * (1 + sp / 100) * (iofZero ? 1 : 1 + IOF);
+    return "R$ " + v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function porId(id) { return CARTOES.find(function (x) { return x.id === id; }); }
+
+  var state = { obj: new Set(), faixa: new Set(), comparar: [], abertos: new Set(), foco: null, desfazer: null };
+
+  function perfil() {
+    var gasto = parseNum($("gasto").value);
+    var ext = Math.min(parseNum($("exterior").value), gasto);
+    return {
+      gasto: gasto, ext: ext, nac: Math.max(gasto - ext, 0),
+      invest: parseNum($("invest").value), renda: parseNum($("renda").value),
+      usosvip: parseNum($("usosvip").value),
+      milheiro: parseNum($("milheiro").value) || 25,
+      dolar: parseNum($("dolar").value) || META.dolarReferencia || 5.15,
+      valorvip: parseNum($("valorvip").value),
+      pref: $("pref").value
+    };
+  }
+
+  // ---------- cálculo ----------
+  function valorFaixa(o, gasto, base) {
+    if (!o.faixas) return base;
+    var v = base;
+    o.faixas.forEach(function (f) { if (gasto >= f[0]) v = f[1]; });
+    return v;
+  }
+  // Calcula uma forma de recompensa (a principal do cartão ou a alternativa)
+  function recompensa(o, p) {
+    var r = { tipo: o.recompensa, nac: 0, int: 0, pontosAno: 0, ganho: 0 };
+    if (o.recompensa === "pontos" || o.recompensa === "milhas") {
+      r.ptsNac = valorFaixa(o, p.gasto, o.ptsNac || 0);
+      r.ptsInt = o.intFixo ? o.ptsInt : (o.faixas || o.ptsInt == null ? r.ptsNac : o.ptsInt);
+      r.pontosAno = (p.nac * r.ptsNac + p.ext * r.ptsInt) / p.dolar * 12;
+      r.ganho = r.pontosAno * p.milheiro / 1000;
+      var fator = p.milheiro / 1000 / p.dolar * 100;
+      r.nac = r.ptsNac * fator; r.int = r.ptsInt * fator;
+    } else if (o.recompensa === "cashback") {
+      r.nac = valorFaixa(o, p.gasto, o.cbNac || 0);
+      r.int = o.cbInt != null ? o.cbInt : r.nac;
+      r.ganho = (p.nac * r.nac + p.ext * r.int) / 100 * 12;
+    }
+    return r;
+  }
+  function escolherRecompensa(c, p) {
+    var a = recompensa(c, p);
+    if (!c.alt) return { r: a, outra: null };
+    var b = recompensa(c.alt, p);
+    var aCash = a.tipo === "cashback";
+    var usar;
+    if (p.pref === "cashback") usar = aCash ? a : b;
+    else if (p.pref === "pontos") usar = aCash ? b : a;
+    else usar = b.ganho > a.ganho ? b : a;
+    return { r: usar, outra: usar === a ? b : a };
+  }
+  function anuidadeEfetiva(c, p) {
+    if (!c.anuidade) return { valor: 0, motivo: "Sem anuidade" };
+    if (c.isenInv && p.invest >= c.isenInv) return { valor: 0, motivo: "Isenta pelos seus investimentos" };
+    if (c.isen100 && p.gasto >= c.isen100) return { valor: 0, motivo: "Isenta pelo seu gasto mensal" };
+    if (c.isen50 && p.gasto >= c.isen50) return { valor: c.anuidade / 2, motivo: "50% de desconto pelo seu gasto" };
+    return { valor: c.anuidade, motivo: "Anuidade cheia" };
+  }
+  function elegivel(c, p) {
+    var req = c.req || {};
+    if (req.convite) return { ok: false, motivo: "Por convite" };
+    var temNum = req.inv != null || req.renda != null || req.gasto != null;
+    if (!temNum) return { ok: true };
+    if ((req.inv != null && p.invest >= req.inv) || (req.renda != null && p.renda >= req.renda) || (req.gasto != null && p.gasto >= req.gasto)) return { ok: true };
+    var partes = [];
+    if (req.inv != null) partes.push("investir " + brl(req.inv));
+    if (req.renda != null) partes.push("renda de " + brl(req.renda));
+    if (req.gasto != null) partes.push("gasto de " + brl(req.gasto));
+    return { ok: false, motivo: "Exige " + partes.join(" ou ") };
+  }
+  function vipEfetivo(c, p) {
+    if (c.vipMinGasto && p.gasto < c.vipMinGasto) return 0;
+    return c.vip || 0;
+  }
+  function avaliar(c, p) {
+    var esc_ = escolherRecompensa(c, p);
+    var r = esc_.r;
+    var a = anuidadeEfetiva(c, p);
+    var spread = c.spread != null ? c.spread : 5;
+    var iofZero = c.iof === true || c.iof === "cashback";
+    var custoExt = p.ext * 12 * (spread / 100 + (iofZero ? 0 : IOF));
+    var vip = vipEfetivo(c, p);
+    var usosCobertos = Math.min(vip, p.usosvip);
+    var valorVip = usosCobertos * p.valorvip;
+    var saldo = r.ganho + valorVip - a.valor - custoExt;
+    var retMedio = p.gasto > 0 ? (p.nac * r.nac + p.ext * r.int) / p.gasto : r.nac;
+    return { c: c, r: r, outra: esc_.outra, a: a, custoExt: custoExt, vip: vip, usosCobertos: usosCobertos, valorVip: valorVip, saldo: saldo, retMedio: retMedio, el: elegivel(c, p), iofZero: iofZero };
+  }
+  function ehPontos(t) { return t === "pontos" || t === "milhas"; }
+
+  // ---------- filtros ----------
+  function passaFiltros(ev) {
+    var c = ev.c, o = state.obj;
+    var tipos = [c.recompensa].concat(c.alt ? [c.alt.recompensa] : []);
+    if (o.has("cashback") && tipos.indexOf("cashback") < 0) return false;
+    if (o.has("pontos") && !tipos.some(ehPontos)) return false;
+    if (o.has("vip") && (c.vip || 0) < 99) return false;
+    if (o.has("aereo") && !c.cia) return false;
+    if (o.has("upgrade") && !(c.upgrade || (c.status && !/consulte/i.test(c.status)))) return false;
+    if (o.has("iof") && !ev.iofZero) return false;
+    if (o.has("spread0") && c.spread !== 0) return false;
+    if (o.has("descontos") && !(c.descontos || c.cia)) return false;
+    if (state.faixa.size && !state.faixa.has(c.faixa)) return false;
+    var b = $("f-bandeira").value; if (b && c.bandeira.indexOf(b) < 0) return false;
+    var bk = $("f-banco").value; if (bk && c.banco !== bk) return false;
+    var cia = $("f-cia").value; if (cia && c.cia !== cia) return false;
+    var an = $("f-anuidade").value; if (an !== "" && c.anuidade > Number(an)) return false;
+    if ($("semanuidade").checked && ev.a.valor > 0) return false;
+    if (!$("f-fora").checked && !ev.el.ok) return false;
+    return true;
+  }
+
+  // ---------- textos ----------
+  var ABREV = { "Visa": "VISA", "Mastercard": "MC", "American Express": "AMEX", "Elo": "ELO", "Visa/Mastercard": "VISA·MC" };
+  function badgesHTML(c, ev) {
+    var b = [];
+    if (c.anuidade === 0) b.push('<span class="badge hl">Sem anuidade</span>');
+    else if (ev.a.valor === 0) b.push('<span class="badge hl">Anuidade zerada para você</span>');
+    if (c.alt) b.push('<span class="badge hl">Pontos ou cashback</span>');
+    if (c.iof === true) b.push('<span class="badge hl">IOF zero</span>');
+    if (c.iof === "cashback") b.push('<span class="badge hl">IOF devolvido</span>');
+    if (c.spread === 0) b.push('<span class="badge hl">Spread zero</span>');
+    if ((c.vip || 0) >= 99) b.push('<span class="badge">Salas VIP ilimitadas</span>');
+    if (c.cia) b.push('<span class="badge gold">' + esc(c.cia) + '</span>');
+    if (c.upgrade) b.push('<span class="badge gold">Upgrade de cabine</span>');
+    if (c.status && !/consulte/i.test(c.status)) b.push('<span class="badge gold">Status na companhia</span>');
+    if (!ev.el.ok) b.push('<span class="badge warn">' + esc(ev.el.motivo) + '</span>');
+    else if (c.req && c.req.txt && c.req.inv == null && c.req.renda == null) b.push('<span class="badge">' + esc(c.req.txt.length > 34 ? "Tem requisito: veja em Detalhes" : c.req.txt) + '</span>');
+    return b.join("");
+  }
+  function retornoTxt(r) {
+    if (ehPontos(r.tipo)) return { v: dec(r.ptsNac) + (r.ptsInt !== r.ptsNac ? " / " + dec(r.ptsInt) : "") + " pts", s: "por US$ · ≈ " + pct(r.nac) };
+    if (r.tipo === "cashback") return { v: pct(r.nac) + (r.int !== r.nac ? " / " + pct(r.int) : ""), s: r.int !== r.nac ? "cashback Brasil / exterior" : "de cashback" };
+    if (r.tipo === "outros") return { v: "Variável", s: "programa próprio" };
+    return { v: "—", s: "não pontua" };
+  }
+  function vipTxt(ev) {
+    var c = ev.c;
+    if (!c.vip) return { v: "—", s: "sem salas" };
+    if (c.vip >= 99) return { v: ev.vip ? "Ilimitado" : "Condicionado", s: ev.vip ? "acessos" : "exige gasto mínimo" };
+    return { v: ev.vip ? c.vip + "/ano" : "Condicionado", s: ev.vip ? "acessos grátis" : "exige gasto mínimo" };
+  }
+  function nomeGanho(r) {
+    if (ehPontos(r.tipo)) return "em pontos (≈ " + mil(r.pontosAno) + " por ano)";
+    if (r.tipo === "cashback") return "de cashback";
+    return "de recompensa";
+  }
+  function contaHTML(ev) {
+    var partes = ['<span class="num">' + brl(ev.r.ganho) + "</span> " + nomeGanho(ev.r)];
+    if (ev.valorVip > 0) partes.push('+ <span class="num">' + brl(ev.valorVip) + "</span> em " + ev.usosCobertos + " acessos VIP");
+    partes.push('<span class="menos">−</span> <span class="num">' + brl(ev.a.valor) + "</span> de anuidade");
+    if (ev.custoExt > 0) partes.push('<span class="menos">−</span> <span class="num">' + brl(ev.custoExt) + "</span> de IOF e spread no exterior <button type=\"button\" class=\"linkbtn tip-toggle\" aria-expanded=\"false\">(o que é spread?)</button>");
+    return '<p class="conta">' + partes.join(" ") + "</p>" + (ev.custoExt > 0 ? '<span class="tip-box" data-tip="spread" hidden>' + spreadTxt() + "</span>" : "");
+  }
+  function escolhaHTML(ev) {
+    if (!ev.outra) return "";
+    var usa = ev.r.tipo === "cashback" ? "cashback" : "pontos";
+    var outra = ev.outra.tipo === "cashback" ? "cashback" : "pontos";
+    var dif = ev.r.ganho - ev.outra.ganho;
+    var pref = $("pref").value;
+    var txt = "Este cartão paga <b>pontos ou cashback</b>, um ou outro. Calculado com <b>" + usa + "</b>";
+    if (pref === "melhor") txt += Math.abs(dif) < 1 ? ". As duas opções rendem o mesmo para você." : ", que rende " + brl(Math.abs(dif)) + " a mais por ano para você do que " + outra + ".";
+    else txt += " (sua preferência). Com " + outra + " seriam " + brl(ev.outra.ganho) + " por ano.";
+    return '<p class="escolha">' + txt + "</p>";
+  }
+
+  function detalhesHTML(ev) {
+    var c = ev.c;
+    var rows = [
+      ["Anuidade", c.anuidade ? brl(c.anuidade) + " por ano" : "Sem anuidade"],
+      ["Isenção", c.isenTxt],
+      ["Programa", c.programa],
+      c.alt ? ["Opção alternativa", c.alt.txt] : null,
+      ["Exterior", (c.iofTxt || (c.iof ? "IOF zero" : "Cobra IOF de 3,5%")) + " · Spread " + (c.spread != null ? pct(c.spread) : "não informado") + ". Numa compra de US$ 100, a fatura viria cerca de " + brl100(c) + " (spread é a margem do banco sobre o dólar)."],
+      ["Salas VIP", c.vipTxt],
+      c.cia ? ["Companhia aérea", c.cia + (c.status ? ". " + c.status : "")] : null,
+      c.upgrade ? ["Upgrade", c.upgrade] : null,
+      c.descontos ? ["Descontos e extras", c.descontos] : null,
+      c.req && c.req.txt ? ["Requisito", c.req.txt] : null,
+      ["Atenção", c.atencao],
+      ["Fonte", '<a href="' + esc(c.fonteUrl) + '" target="_blank" rel="noopener">' + esc(c.fonteNome) + '</a> · <span class="conf ' + esc(c.conf) + '">confiança ' + ({ alta: "alta", media: "média", baixa: "baixa" }[c.conf] || c.conf) + '</span>']
+    ].filter(Boolean);
+    return '<dl class="det">' + rows.map(function (r) {
+      var safe = r[0] === "Fonte" ? r[1] : esc(r[1]);
+      return "<dt>" + esc(r[0]) + "</dt><dd>" + safe + "</dd>";
+    }).join("") + "</dl>";
+  }
+
+  function ordenar(lista) {
+    var o = $("ordem").value;
+    var fns = {
+      saldo: function (a, b) { return b.saldo - a.saldo; },
+      ptsNac: function (a, b) { return (b.r.ptsNac || 0) - (a.r.ptsNac || 0) || b.r.nac - a.r.nac || b.saldo - a.saldo; },
+      ptsInt: function (a, b) { return (b.r.ptsInt || 0) - (a.r.ptsInt || 0) || b.r.int - a.r.int || b.saldo - a.saldo; },
+      retorno: function (a, b) { return b.retMedio - a.retMedio || b.saldo - a.saldo; },
+      anuidade: function (a, b) { return a.a.valor - b.a.valor || b.saldo - a.saldo; },
+      vip: function (a, b) { return b.vip - a.vip || b.saldo - a.saldo; }
+    };
+    return lista.sort(fns[o] || fns.saldo);
+  }
+
+  // ---------- destaques ----------
+  function melhor(lista, filtro, cmp) {
+    var l = lista.filter(filtro);
+    if (!l.length) return null;
+    return l.sort(cmp || function (a, b) { return b.saldo - a.saldo; })[0];
+  }
+  function renderDestaques(todos) {
+    var ok = todos.filter(function (ev) { return ev.el.ok; });
+    var itens = [
+      ["Mais dinheiro de volta", melhor(ok, function () { return true; })],
+      ["Sem anuidade para você", melhor(ok, function (ev) { return ev.a.valor === 0; })],
+      ["Para viajar", melhor(ok, function (ev) { return ev.vip >= 99 || ev.c.cia || ev.vip >= 4; })],
+      ["Mais pontos por dólar", melhor(ok, function (ev) { return ehPontos(ev.r.tipo); }, function (a, b) { return (b.r.ptsNac || 0) - (a.r.ptsNac || 0) || b.saldo - a.saldo; })]
+    ];
+    $("highs").innerHTML = itens.map(function (it) {
+      var ev = it[1];
+      if (!ev) return '<div class="high" aria-disabled="true"><span class="k">' + it[0] + '</span><span class="n">Nenhum ao seu alcance</span></div>';
+      var extra = it[0] === "Mais pontos por dólar" ? '<span class="v">' + dec(ev.r.ptsNac) + " pts/US$</span>" : '<span class="v ' + (ev.saldo >= 0 ? "pos" : "neg") + '">' + brl(ev.saldo) + " no ano</span>";
+      return '<button type="button" class="high" data-foco="' + ev.c.id + '"><span class="k">' + it[0] + '</span><span class="n">' + esc(ev.c.nome) + "</span>" + extra + "</button>";
+    }).join("");
+  }
+
+  // ---------- render ----------
+  function cartaoHTML(ev, i, extraCls) {
+    var c = ev.c, rt = retornoTxt(ev.r), vp = vipTxt(ev);
+    var aberto = state.abertos.has(c.id), cmp = state.comparar.indexOf(c.id) >= 0;
+    return '<article class="res' + (ev.el.ok ? "" : " out") + (extraCls || "") + '" id="c-' + c.id + '" data-id="' + c.id + '">' +
+      '<div class="plastic ' + c.faixa + '" aria-hidden="true">' + (ABREV[c.bandeira] || esc(c.bandeira)) + '</div>' +
+      '<div style="min-width:0"><div class="res-name">' + (i != null ? '<span class="rank">' + (i + 1) + '.</span>' : "") + esc(c.nome) + '</div>' +
+      '<div class="res-sub">' + esc(c.banco) + ' · ' + esc(c.bandeira) + ' ' + esc(c.categoria) + '</div></div>' +
+      '<div class="res-body">' +
+        '<div class="badges">' + badgesHTML(c, ev) + '</div>' +
+        '<div class="money-row">' +
+          '<div class="saldo"><div class="k">Saldo estimado no ano</div><div class="v ' + (ev.saldo >= 0 ? "pos" : "neg") + '">' + brl(ev.saldo) + '</div><div class="m">≈ ' + brl(ev.saldo / 12) + ' por mês para o seu perfil</div></div>' +
+          '<div class="metrics">' +
+            '<div class="metric"><div class="k">Anuidade para você</div><div class="v">' + brl(ev.a.valor) + '</div><div class="s">' + (c.anuidade ? "cheia " + brl(c.anuidade) : "sem anuidade") + '</div></div>' +
+            '<div class="metric"><div class="k">Retorno</div><div class="v">' + rt.v + '</div><div class="s">' + rt.s + '</div></div>' +
+            '<div class="metric"><div class="k">Salas VIP</div><div class="v">' + vp.v + '</div><div class="s">' + vp.s + '</div></div>' +
+          '</div>' +
+        '</div>' +
+        contaHTML(ev) +
+        escolhaHTML(ev) +
+        '<p class="why"><b>Indicado para:</b> ' + esc(c.indicado) + '</p>' +
+        '<div class="res-actions"><button type="button" class="btn" data-act="det" aria-expanded="' + aberto + '">' + (aberto ? "Ocultar detalhes" : "Detalhes") + '</button>' +
+        '<button type="button" class="btn' + (cmp ? " on" : "") + '" data-act="cmp" aria-pressed="' + cmp + '">' + (cmp ? "Na comparação" : "Comparar") + '</button></div>' +
+        (aberto ? detalhesHTML(ev) : "") +
+      '</div></article>';
+  }
+
+  function render() {
+    var p = perfil();
+    $("alerta-rotativo").hidden = $("integral").checked;
+    var todos = CARTOES.map(function (c) { return avaliar(c, p); });
+    renderDestaques(todos);
+    var lista = ordenar(todos.filter(passaFiltros));
+    var fora = todos.filter(function (ev) { return !ev.el.ok; }).length;
+    $("count").innerHTML = "<strong>" + lista.length + "</strong> de " + CARTOES.length + " cartões" + (!$("f-fora").checked && fora ? " · " + fora + " fora do seu alcance ocultos" : "");
+    var html = "";
+    if (state.foco && !lista.some(function (ev) { return ev.c.id === state.foco; })) {
+      var evf = todos.find(function (ev) { return ev.c.id === state.foco; });
+      if (evf) html += '<p class="sub-hint" style="margin:0">Este destaque não aparece com os filtros atuais:</p>' + cartaoHTML(evf, null, " foco");
+    }
+    if (!lista.length) html += '<div class="empty">Nenhum cartão atende a todos os filtros. Tire um filtro ou marque “Incluir cartões fora do meu alcance”.</div>';
+    else html += lista.map(function (ev, i) { return cartaoHTML(ev, i, (i === 0 && $("ordem").value === "saldo" ? " top1" : "") + (ev.c.id === state.foco ? " foco" : "")); }).join("");
+    $("results").innerHTML = html;
+    renderComparar(p);
+    atualizarMaisDot();
+    salvar();
+  }
+
+  function renderComparar(p) {
+    var ids = state.comparar;
+    var tray = $("tray");
+    if (!ids.length) { tray.hidden = true; $("comparar").hidden = true; return; }
+    tray.hidden = false;
+    tray.innerHTML = ids.map(function (id) {
+      var c = porId(id);
+      return '<span class="pick">' + esc(c.nome) + '<button type="button" data-rm="' + id + '" aria-label="Remover ' + esc(c.nome) + '">×</button></span>';
+    }).join("") + (ids.length < 2 ? '<span style="font-size:13px;color:var(--muted)">Escolha mais um para comparar (até 3)</span>' : '<a class="btn on" href="#comparar" style="text-decoration:none">Ver comparação</a>');
+    if (ids.length < 2) { $("comparar").hidden = true; return; }
+    $("comparar").hidden = false;
+    var evs = ids.map(function (id) { return avaliar(porId(id), p); });
+    var melhorSaldo = Math.max.apply(null, evs.map(function (e) { return e.saldo; }));
+    var linhas = [
+      ["Saldo no ano", function (e) { return { t: brl(e.saldo), best: e.saldo === melhorSaldo }; }],
+      ["Banco e bandeira", function (e) { return e.c.banco + " · " + e.c.bandeira + " " + e.c.categoria; }],
+      ["Recompensa no ano", function (e) { return brl(e.r.ganho) + " " + nomeGanho(e.r); }],
+      ["Anuidade cheia", function (e) { return e.c.anuidade ? brl(e.c.anuidade) : "Sem anuidade"; }],
+      ["Anuidade para você", function (e) { return brl(e.a.valor) + " (" + e.a.motivo.toLowerCase() + ")"; }],
+      ["Isenção", function (e) { return e.c.isenTxt; }],
+      ["Retorno", function (e) { var r = retornoTxt(e.r); return r.v + " " + r.s; }],
+      ["Programa", function (e) { return e.c.programa + (e.c.alt ? " Alternativa: " + e.c.alt.txt + "." : ""); }],
+      ["Exterior", function (e) { return (e.c.iofTxt || (e.c.iof ? "IOF zero" : "Cobra IOF")) + " · spread " + (e.c.spread != null ? pct(e.c.spread) : "n/i"); }],
+      ["Salas VIP", function (e) { return e.c.vipTxt; }],
+      ["Companhia aérea", function (e) { return e.c.cia ? e.c.cia + (e.c.upgrade ? ". " + e.c.upgrade : "") + (e.c.status ? ". " + e.c.status : "") : "—"; }],
+      ["Requisito", function (e) { return e.c.req && e.c.req.txt ? e.c.req.txt : "—"; }],
+      ["Atenção", function (e) { return e.c.atencao; }]
+    ];
+    $("cmp-table").innerHTML = "<thead><tr><th></th>" + evs.map(function (e) { return '<th scope="col">' + esc(e.c.nome) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      linhas.map(function (l) {
+        return '<tr><th scope="row">' + esc(l[0]) + "</th>" + evs.map(function (e) {
+          var v = l[1](e); var best = false;
+          if (typeof v === "object") { best = v.best; v = v.t; }
+          return "<td" + (best ? ' class="best num"' : "") + ">" + esc(v) + "</td>";
+        }).join("") + "</tr>";
+      }).join("") + "</tbody>";
+  }
+
+  // ---------- mais filtros ----------
+  var MAIS = ["f-bandeira", "f-banco", "f-cia", "f-anuidade"];
+  function setMais(aberto) {
+    $("mais-filtros").hidden = !aberto;
+    $("mais-toggle").setAttribute("aria-expanded", aberto);
+  }
+  function atualizarMaisDot() {
+    var n = MAIS.filter(function (id) { return $(id).value !== ""; }).length;
+    $("mais-dot").hidden = !n || !$("mais-filtros").hidden;
+    $("mais-dot").textContent = n;
+  }
+  $("mais-toggle").addEventListener("click", function () { setMais($("mais-filtros").hidden); atualizarMaisDot(); salvar(); });
+
+  // ---------- filtros: estado ----------
+  function filtrosAtuais() {
+    var o = { obj: Array.from(state.obj), faixa: Array.from(state.faixa), semanuidade: $("semanuidade").checked, fora: $("f-fora").checked, ordem: $("ordem").value };
+    MAIS.forEach(function (id) { o[id] = $(id).value; });
+    return o;
+  }
+  function aplicarFiltros(o) {
+    state.obj = new Set(o.obj || []); state.faixa = new Set(o.faixa || []);
+    $("semanuidade").checked = !!o.semanuidade; $("f-fora").checked = !!o.fora;
+    if (o.ordem) $("ordem").value = o.ordem;
+    MAIS.forEach(function (id) { $(id).value = o[id] || ""; });
+    syncChips();
+  }
+
+  // ---------- persistência leve ----------
+  var CAMPOS = ["gasto", "exterior", "invest", "renda", "usosvip", "milheiro", "dolar", "valorvip", "pref"];
+  function salvar() {
+    try {
+      var o = filtrosAtuais();
+      o.integral = $("integral").checked;
+      o.maisAberto = !$("mais-filtros").hidden;
+      CAMPOS.forEach(function (k) { o[k] = $(k).value; });
+      localStorage.setItem(STORE_KEY, JSON.stringify(o));
+    } catch (e) {}
+  }
+  function carregar() {
+    try {
+      var o = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      if (!o) return;
+      CAMPOS.forEach(function (k) { if (o[k] != null) $(k).value = o[k]; });
+      aplicarFiltros(o);
+      $("integral").checked = o.integral !== false;
+      setMais(!!o.maisAberto || MAIS.some(function (id) { return $(id).value !== ""; }));
+    } catch (e) {}
+  }
+  function syncChips() {
+    document.querySelectorAll("#f-obj .chip").forEach(function (b) { b.setAttribute("aria-pressed", state.obj.has(b.dataset.v)); });
+    document.querySelectorAll("#f-faixa .chip").forEach(function (b) { b.setAttribute("aria-pressed", state.faixa.has(b.dataset.v)); });
+  }
+  function limparPresets() {
+    document.querySelectorAll("[data-preset]").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+    state.desfazer = null;
+    $("preset-status").textContent = "Os atalhos só ajustam filtros e ordem. O seu perfil não muda.";
+  }
+
+  // ---------- atalhos: mudam só filtros e ordem ----------
+  var PRESETS = {
+    semanuidade: { desc: "“Só cartões que saem sem anuidade para mim”", f: { semanuidade: true, ordem: "saldo" } },
+    vip: { desc: "“Salas VIP ilimitadas”", f: { obj: ["vip"], ordem: "saldo" } },
+    aereo: { desc: "“Vinculado a companhia aérea”", f: { obj: ["aereo"], ordem: "saldo" } },
+    exterior: { desc: "“Sem IOF”", f: { obj: ["iof"], ordem: "saldo" } },
+    pontos: { desc: "“Pontos e milhas”, ordenado por pontos por dólar", f: { obj: ["pontos"], ordem: "ptsNac" } }
+  };
+  document.querySelectorAll("[data-preset]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var ja = btn.getAttribute("aria-pressed") === "true";
+      if (ja) { if (state.desfazer) aplicarFiltros(state.desfazer); limparPresets(); render(); return; }
+      var antes = state.desfazer || filtrosAtuais();
+      var pr = PRESETS[btn.dataset.preset];
+      var novo = { obj: pr.f.obj || [], faixa: [], semanuidade: !!pr.f.semanuidade, fora: $("f-fora").checked, ordem: pr.f.ordem };
+      aplicarFiltros(novo);
+      state.desfazer = antes;
+      document.querySelectorAll("[data-preset]").forEach(function (b) { b.setAttribute("aria-pressed", b === btn); });
+      $("preset-status").innerHTML = "Filtro aplicado: " + pr.desc + ". Seu perfil continua o mesmo. <button type=\"button\" class=\"linkbtn\" id=\"desfazer\">Desfazer</button>";
+      state.foco = null;
+      render();
+    });
+  });
+  $("preset-status").addEventListener("click", function (e) {
+    if (e.target.id !== "desfazer" || !state.desfazer) return;
+    aplicarFiltros(state.desfazer); limparPresets(); render();
+  });
+
+  // ---------- eventos ----------
+  function popular(sel, valores) {
+    valores.sort(function (a, b) { return a.localeCompare(b, "pt-BR"); }).forEach(function (v) {
+      var o = document.createElement("option"); o.value = v; o.textContent = v; $(sel).appendChild(o);
+    });
+  }
+  var bandeiras = new Set();
+  CARTOES.forEach(function (c) { c.bandeira.split("/").forEach(function (b) { bandeiras.add(b); }); });
+  popular("f-bandeira", Array.from(bandeiras));
+  popular("f-banco", Array.from(new Set(CARTOES.map(function (c) { return c.banco; }))));
+  popular("f-cia", Array.from(new Set(CARTOES.filter(function (c) { return c.cia; }).map(function (c) { return c.cia; }))));
+
+  document.querySelectorAll(".quick button").forEach(function (b) {
+    b.addEventListener("click", function () { $(b.parentNode.dataset.target).value = fmtInput(Number(b.dataset.v)); render(); });
+  });
+  ["gasto", "exterior", "invest", "renda", "valorvip"].forEach(function (k) {
+    $(k).addEventListener("blur", function () { $(k).value = fmtInput(parseNum($(k).value)); });
+  });
+  var t;
+  $("perfil").addEventListener("input", function () { clearTimeout(t); t = setTimeout(render, 180); });
+  $("perfil").addEventListener("change", render);
+  $("perfil").addEventListener("submit", function (e) { e.preventDefault(); render(); });
+  var filtroMudou = function () { limparPresets(); state.foco = null; render(); };
+  MAIS.concat(["f-fora", "semanuidade"]).forEach(function (id) { $(id).addEventListener("change", filtroMudou); });
+  $("ordem").addEventListener("change", render);
+  function toggleSet(get, wrap) {
+    $(wrap).addEventListener("click", function (e) {
+      var b = e.target.closest(".chip"); if (!b) return;
+      var s = get(), v = b.dataset.v; if (s.has(v)) s.delete(v); else s.add(v);
+      syncChips(); filtroMudou();
+    });
+  }
+  toggleSet(function () { return state.obj; }, "f-obj");
+  toggleSet(function () { return state.faixa; }, "f-faixa");
+  $("limpar").addEventListener("click", function () {
+    aplicarFiltros({ obj: [], faixa: [], semanuidade: false, fora: false, ordem: $("ordem").value });
+    filtroMudou();
+  });
+  $("results").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-act]"); if (!b) return;
+    var id = b.closest(".res").dataset.id;
+    if (b.dataset.act === "det") { if (state.abertos.has(id)) state.abertos.delete(id); else state.abertos.add(id); }
+    if (b.dataset.act === "cmp") {
+      var i = state.comparar.indexOf(id);
+      if (i >= 0) state.comparar.splice(i, 1);
+      else { if (state.comparar.length >= 3) state.comparar.shift(); state.comparar.push(id); }
+    }
+    render();
+  });
+  $("highs").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-foco]"); if (!b) return;
+    state.foco = b.dataset.foco; state.abertos.add(state.foco);
+    render();
+    var el = $("c-" + state.foco);
+    if (el) el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  });
+  $("tray").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-rm]"); if (!b) return;
+    state.comparar = state.comparar.filter(function (x) { return x !== b.dataset.rm; }); render();
+  });
+  document.querySelectorAll("[data-open-learn]").forEach(function (a) {
+    a.addEventListener("click", function () { $("entenda").open = true; });
+  });
+
+  function preencherDicas() { document.querySelectorAll('.tip-box[data-tip="spread"]').forEach(function (b) { b.innerHTML = spreadTxt(); }); }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".tip-toggle"); if (!b) return;
+    var box = b.closest("small, p") ? b.closest("small, p").nextElementSibling : b.nextElementSibling;
+    if (!box || !box.classList.contains("tip-box")) return;
+    box.innerHTML = spreadTxt();
+    box.hidden = !box.hidden;
+    b.setAttribute("aria-expanded", !box.hidden);
+  });
+  $("dolar").addEventListener("change", preencherDicas);
+  var d = META.atualizado.split("-");
+  $("stamp-date").textContent = d[2] + "/" + d[1] + "/" + d[0];
+  $("stamp-count").textContent = CARTOES.length;
+  carregar(); syncChips(); render();
+})();
+</script>
+
+</body>
+</html>
