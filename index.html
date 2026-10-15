@@ -496,6 +496,7 @@ table.vtable td.num { white-space: nowrap; }
           <li><b>Anuidade para você:</b> zera ou cai pela metade quando o seu gasto mensal ou os seus investimentos atingem a regra do banco. Atenção: a maioria dos bancos confere a meta mês a mês. Se num mês você gastar menos, paga aquela parcela. Quando o seu gasto está perto da meta, o cartão mostra quanto falta.</li>
           <li><b>Assinaturas exigidas:</b> alguns cartões só dão o benefício com uma assinatura paga, como o Meli+ no Mercado Pago ou o Duo Gourmet no Inter Black. O custo anual entra na conta.</li>
           <li><b>Custo no exterior:</b> spread do banco + IOF de 3,5% sobre o que você gasta em moeda estrangeira. Nos cartões com IOF zero ou devolvido, só o spread conta. Quando o banco não informa o spread, o cálculo usa 5%.</li>
+          <li><b>Cartões por convite:</b> Centurion, Visa Infinite Privilege e cartões de segmento private não têm requisito público. O site os trata como ao seu alcance quando você informa R$ 3 milhões ou mais investidos, renda de R$ 50 mil por mês ou gasto de R$ 50 mil por mês, e mostra o aviso “Sujeito a convite”. Abaixo disso, aparecem só com “Incluir cartões fora do meu alcance”.</li>
           <li><b>Salas VIP:</b> só entram se você disser quantas vezes usaria por ano, até o limite do cartão, a R$ 150 por acesso (valor que você pode mudar).</li>
         </ul>
         <p>O resultado é uma estimativa. Bônus de adesão, campanhas de pontos em dobro e cashback extra em lojas parceiras não entram, porque mudam o tempo todo.</p>
@@ -699,9 +700,14 @@ table.vtable td.num { white-space: nowrap; }
     }
     return null;
   }
+  // Cartões por convite contam como ao alcance quando o perfil é compatível com segmentos private
+  var CONVITE = { inv: 3000000, renda: 50000, gasto: 50000 };
   function elegivel(c, p) {
     var req = c.req || {};
-    if (req.convite) return { ok: false, motivo: "Por convite" };
+    if (req.convite) {
+      if (p.invest >= CONVITE.inv || p.renda >= CONVITE.renda || p.gasto >= CONVITE.gasto) return { ok: true, convite: true };
+      return { ok: false, motivo: "Por convite" };
+    }
     var temNum = req.inv != null || req.renda != null || req.gasto != null;
     if (!temNum) return { ok: true };
     if ((req.inv != null && p.invest >= req.inv) || (req.renda != null && p.renda >= req.renda) || (req.gasto != null && p.gasto >= req.gasto)) return { ok: true };
@@ -767,6 +773,7 @@ table.vtable td.num { white-space: nowrap; }
   function badgesLista(c, ev) {
     var b = [];
     if (!ev.el.ok) b.push(["warn", ev.el.motivo]);
+    else if (ev.el.convite) b.push(["warn", "Sujeito a convite"]);
     if (c.anuidade === 0) b.push(["hl", "Sem anuidade"]);
     else if (ev.a.valor === 0) b.push(["hl", "Anuidade zerada para você"]);
     if (c.assinatura && ev.assin > 0) b.push(["warn", "Exige " + c.assinatura.nome]);
