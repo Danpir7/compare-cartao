@@ -122,6 +122,9 @@ select, .plain { border: 1px solid var(--line); border-radius: 8px; background: 
 .quick button:hover { border-color: var(--accent); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chips .chip { font-size: 13.5px; padding: 6px 11px; }
+.chips.mini { gap: 5px; }
+.chips.mini .chip { font-size: 12.5px; padding: 4px 9px; }
+.multi-n { font-weight: 400; color: var(--muted); }
 .check { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; cursor: pointer; }
 .check input { margin-top: 3px; accent-color: var(--accent); }
 details.adv summary { cursor: pointer; font-size: 13.5px; color: var(--muted); }
@@ -180,8 +183,12 @@ details.adv .field + .field, details.adv .row2 { margin-top: 10px; }
 .res.out { opacity: 0.8; }
 .res.top1 { border-color: var(--accent); }
 .res.foco { border-color: var(--gold); }
-.plastic { width: 62px; height: 40px; border-radius: 6px; position: relative; display: flex; align-items: flex-end; justify-content: flex-end; padding: 3px 5px; font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.04em; color: #fff; margin-top: 2px; }
-.plastic::before { content: ""; position: absolute; left: 7px; top: 12px; width: 10px; height: 8px; border-radius: 2px; background: #E9C162; }
+.plastic { width: 100px; height: 63px; border-radius: 7px; position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 6px 7px 5px; color: #fff; margin-top: 2px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); }
+.plastic::before { content: ""; position: absolute; left: 8px; top: 25px; width: 13px; height: 10px; border-radius: 2px; background: #E9C162; }
+.pl-banco { font-family: var(--font-body); font-size: 9.5px; font-weight: 600; line-height: 1.1; letter-spacing: 0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-base { display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; font-family: var(--font-mono); font-size: 7.5px; font-weight: 500; letter-spacing: 0.03em; line-height: 1.1; text-transform: uppercase; }
+.pl-cat { min-width: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; opacity: 0.92; }
+.pl-band { flex: none; font-weight: 500; }
 .plastic.entrada { background: var(--card-entrada); color: var(--ink); }
 .plastic.intermediario { background: var(--card-intermediario); }
 .plastic.alta { background: var(--card-alta); }
@@ -190,7 +197,7 @@ details.adv .field + .field, details.adv .row2 { margin-top: 10px; }
 .rank { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); margin-right: 6px; }
 .res-sub { font-size: 13.5px; color: var(--muted); }
 .res-body { grid-column: 2; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-@media (max-width: 520px) { .res { padding: 16px; } .res-body { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .res { padding: 16px; } .res-body { grid-column: 1 / -1; } .plastic { width: 88px; height: 56px; } .plastic::before { top: 21px; } .pl-banco { font-size: 8.5px; } .pl-base { font-size: 7px; } }
 .badges { display: flex; flex-wrap: wrap; gap: 5px; }
 .badge { font-size: 12.5px; padding: 2px 8px; border-radius: 4px; background: var(--surface-2); white-space: nowrap; }
 .badge.hl { background: var(--accent-soft); }
@@ -417,11 +424,10 @@ table.vtable td.num { white-space: nowrap; }
 
         <button type="button" class="more-toggle" id="mais-toggle" aria-expanded="false" aria-controls="mais-filtros">Mais filtros <small>bandeira, banco, companhia, anuidade</small> <span class="dot" id="mais-dot" hidden></span> <span class="arrow" aria-hidden="true">▾</span></button>
         <div class="more-box" id="mais-filtros" hidden>
-          <div class="row2">
-            <div class="field"><label for="f-bandeira">Bandeira</label><select id="f-bandeira"><option value="">Todas</option></select></div>
-            <div class="field"><label for="f-banco">Banco</label><select id="f-banco"><option value="">Todos</option></select></div>
-          </div>
-          <div class="field"><label for="f-cia">Companhia aérea</label><select id="f-cia"><option value="">Qualquer</option></select></div>
+          <small class="sub-hint">Marque quantos quiser. Sem nada marcado, vale qualquer um.</small>
+          <div class="field"><span class="flabel">Bandeira</span><div class="chips mini" id="f-bandeira" role="group" aria-label="Bandeira"></div></div>
+          <div class="field"><span class="flabel">Banco <small class="multi-n" id="f-banco-n"></small></span><div class="chips mini" id="f-banco" role="group" aria-label="Banco"></div></div>
+          <div class="field"><span class="flabel">Companhia aérea</span><div class="chips mini" id="f-cia" role="group" aria-label="Companhia aérea"></div></div>
           <div class="field"><label for="f-anuidade">Anuidade cheia de até</label>
             <select id="f-anuidade"><option value="">Qualquer valor</option><option value="0">Sem anuidade</option><option value="1200">R$ 1.200</option><option value="2500">R$ 2.500</option><option value="5000">R$ 5.000</option></select>
           </div>
@@ -609,7 +615,7 @@ table.vtable td.num { white-space: nowrap; }
   }
   function porId(id) { return CARTOES.find(function (x) { return x.id === id; }); }
 
-  var state = { obj: new Set(), faixa: new Set(), comparar: [], abertos: new Set(), foco: null, desfazer: null, todos: false };
+  var state = { obj: new Set(), faixa: new Set(), multi: { "f-bandeira": new Set(), "f-banco": new Set(), "f-cia": new Set() }, comparar: [], abertos: new Set(), foco: null, desfazer: null, todos: false };
 
   function perfil() {
     var gasto = parseNum($("gasto").value);
@@ -741,9 +747,10 @@ table.vtable td.num { white-space: nowrap; }
     if (o.has("spread0") && c.spread !== 0) return false;
     if (o.has("descontos") && !(c.descontos || c.cia)) return false;
     if (state.faixa.size && !state.faixa.has(c.faixa)) return false;
-    var b = $("f-bandeira").value; if (b && c.bandeira.indexOf(b) < 0) return false;
-    var bk = $("f-banco").value; if (bk && c.banco !== bk) return false;
-    var cia = $("f-cia").value; if (cia && c.cia !== cia) return false;
+    var m = state.multi;
+    if (m["f-bandeira"].size && !c.bandeira.split("/").some(function (b) { return m["f-bandeira"].has(b); })) return false;
+    if (m["f-banco"].size && !m["f-banco"].has(c.banco)) return false;
+    if (m["f-cia"].size && !m["f-cia"].has(c.cia)) return false;
     var an = $("f-anuidade").value; if (an !== "" && c.anuidade > Number(an)) return false;
     if ($("semanuidade").checked && ev.a.valor > 0) return false;
     if (!$("f-fora").checked && !ev.el.ok) return false;
@@ -751,8 +758,7 @@ table.vtable td.num { white-space: nowrap; }
   }
   function filtrosAtivos() {
     var n = state.obj.size + state.faixa.size + ($("semanuidade").checked ? 1 : 0) + ($("f-fora").checked ? 1 : 0);
-    MAIS.forEach(function (id) { if ($(id).value !== "") n++; });
-    return n;
+    return n + maisAtivos();
   }
 
   // ---------- textos ----------
@@ -896,7 +902,7 @@ table.vtable td.num { white-space: nowrap; }
     var c = ev.c, rt = retornoTxt(ev.r), vp = vipTxt(ev);
     var aberto = state.abertos.has(c.id), cmp = state.comparar.indexOf(c.id) >= 0;
     return '<article class="res' + (ev.el.ok ? "" : " out") + (extraCls || "") + '" id="c-' + c.id + '" data-id="' + c.id + '">' +
-      '<div class="plastic ' + c.faixa + '" aria-hidden="true">' + (ABREV[c.bandeira] || esc(c.bandeira)) + '</div>' +
+      '<div class="plastic ' + c.faixa + '" aria-hidden="true"><span class="pl-banco">' + esc(c.banco.replace(/ Investimentos$/, "")) + '</span><span class="pl-base"><span class="pl-cat">' + esc(c.categoria) + '</span><span class="pl-band">' + (ABREV[c.bandeira] || esc(c.bandeira)) + '</span></span></div>' +
       '<div style="min-width:0"><h3 class="res-name">' + (i != null ? '<span class="rank">' + (i + 1) + '.</span>' : "") + esc(c.nome) + '</h3>' +
       '<div class="res-sub">' + esc(c.banco) + ' · ' + esc(c.bandeira) + ' ' + esc(c.categoria) + '</div></div>' +
       '<div class="res-body">' +
@@ -996,10 +1002,14 @@ table.vtable td.num { white-space: nowrap; }
   }
 
   // ---------- mais filtros ----------
-  var MAIS = ["f-bandeira", "f-banco", "f-cia", "f-anuidade"];
+  var MULTI = ["f-bandeira", "f-banco", "f-cia"];
+  var MAIS = ["f-anuidade"];
+  function maisAtivos() {
+    return MULTI.filter(function (id) { return state.multi[id].size; }).length + MAIS.filter(function (id) { return $(id).value !== ""; }).length;
+  }
   function setMais(aberto) { $("mais-filtros").hidden = !aberto; $("mais-toggle").setAttribute("aria-expanded", aberto); }
   function atualizarMaisDot() {
-    var n = MAIS.filter(function (id) { return $(id).value !== ""; }).length;
+    var n = maisAtivos();
     $("mais-dot").hidden = !n || !$("mais-filtros").hidden;
     $("mais-dot").textContent = n;
   }
@@ -1021,6 +1031,7 @@ table.vtable td.num { white-space: nowrap; }
   function filtrosAtuais() {
     var o = { obj: Array.from(state.obj), faixa: Array.from(state.faixa), semanuidade: $("semanuidade").checked, fora: $("f-fora").checked, ordem: $("ordem").value };
     MAIS.forEach(function (id) { o[id] = $(id).value; });
+    MULTI.forEach(function (id) { o[id] = Array.from(state.multi[id]); });
     return o;
   }
   function aplicarFiltros(o) {
@@ -1028,6 +1039,7 @@ table.vtable td.num { white-space: nowrap; }
     $("semanuidade").checked = !!o.semanuidade; $("f-fora").checked = !!o.fora;
     if (o.ordem) $("ordem").value = o.ordem;
     MAIS.forEach(function (id) { $(id).value = o[id] || ""; });
+    MULTI.forEach(function (id) { var v = o[id]; state.multi[id] = new Set(Array.isArray(v) ? v : (v ? [v] : [])); });
     syncChips();
   }
 
@@ -1049,12 +1061,15 @@ table.vtable td.num { white-space: nowrap; }
       CAMPOS.forEach(function (k) { if (o[k] != null) $(k).value = o[k]; });
       aplicarFiltros(o);
       $("integral").checked = o.integral !== false;
-      setMais(!!o.maisAberto || MAIS.some(function (id) { return $(id).value !== ""; }));
+      setMais(!!o.maisAberto || maisAtivos() > 0);
     } catch (e) {}
   }
   function syncChips() {
     document.querySelectorAll("#f-obj .chip").forEach(function (b) { b.setAttribute("aria-pressed", state.obj.has(b.dataset.v)); });
     document.querySelectorAll("#f-faixa .chip").forEach(function (b) { b.setAttribute("aria-pressed", state.faixa.has(b.dataset.v)); });
+    MULTI.forEach(function (id) { document.querySelectorAll("#" + id + " .chip").forEach(function (b) { b.setAttribute("aria-pressed", state.multi[id].has(b.dataset.v)); }); });
+    var nb = state.multi["f-banco"].size; $("f-banco-n").textContent = nb ? "(" + nb + " marcado" + (nb > 1 ? "s" : "") + ")" : "";
+    if (typeof atualizarMaisDot === "function") atualizarMaisDot();
   }
   function limparPresets() {
     document.querySelectorAll("[data-preset]").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
@@ -1076,7 +1091,9 @@ table.vtable td.num { white-space: nowrap; }
       if (ja) { if (state.desfazer) aplicarFiltros(state.desfazer); limparPresets(); render(); return; }
       var antes = state.desfazer || filtrosAtuais();
       var pr = PRESETS[btn.dataset.preset];
-      aplicarFiltros({ obj: pr.f.obj || [], faixa: [], semanuidade: !!pr.f.semanuidade, fora: $("f-fora").checked, ordem: pr.f.ordem });
+      var novo = { obj: pr.f.obj || [], faixa: [], semanuidade: !!pr.f.semanuidade, fora: $("f-fora").checked, ordem: pr.f.ordem };
+      MULTI.forEach(function (id) { novo[id] = Array.from(state.multi[id]); });
+      aplicarFiltros(novo);
       state.desfazer = antes;
       document.querySelectorAll("[data-preset]").forEach(function (b) { b.setAttribute("aria-pressed", b === btn); });
       $("preset-status").innerHTML = "Filtro aplicado: " + pr.desc + ". Seu perfil continua o mesmo. <button type=\"button\" class=\"linkbtn\" id=\"desfazer\">Desfazer</button>";
@@ -1092,7 +1109,7 @@ table.vtable td.num { white-space: nowrap; }
   // ---------- eventos ----------
   function popular(sel, valores) {
     valores.sort(function (a, b) { return a.localeCompare(b, "pt-BR"); }).forEach(function (v) {
-      var o = document.createElement("option"); o.value = v; o.textContent = v; $(sel).appendChild(o);
+      var o = document.createElement("button"); o.type = "button"; o.className = "chip"; o.dataset.v = v; o.setAttribute("aria-pressed", "false"); o.textContent = v; $(sel).appendChild(o);
     });
   }
   var bandeiras = new Set();
@@ -1123,6 +1140,7 @@ table.vtable td.num { white-space: nowrap; }
   }
   toggleSet(function () { return state.obj; }, "f-obj");
   toggleSet(function () { return state.faixa; }, "f-faixa");
+  MULTI.forEach(function (id) { toggleSet(function () { return state.multi[id]; }, id); });
   $("limpar").addEventListener("click", function () {
     aplicarFiltros({ obj: [], faixa: [], semanuidade: false, fora: false, ordem: $("ordem").value });
     filtroMudou();
